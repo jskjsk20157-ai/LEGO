@@ -459,7 +459,13 @@ export default function App() {
             </div>
           </div>
 
-          <button 
+          {error && (
+            <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-4 text-red-700 font-bold text-sm break-all">
+              {error}
+            </div>
+          )}
+
+          <button
             onClick={analyzeLego}
             disabled={isAnalyzing}
             className="w-full bg-[#e53935] hover:bg-[#d32f2f] disabled:bg-[#e53935]/50 text-white font-black py-5 rounded-2xl transition-all flex items-center justify-center gap-3 text-xl shadow-md active:shadow-none active:translate-y-[2px]"
