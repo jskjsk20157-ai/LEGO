@@ -308,17 +308,15 @@ export default function App() {
         model: model,
         contents: prompt,
         config: {
-          tools: [{ googleSearch: {} }]
+          responseMimeType: "application/json",
         }
       });
 
-      const rawText = response.text || "{}";
-      const jsonMatch = rawText.match(/```json\s*([\s\S]*?)```/) || rawText.match(/(\{[\s\S]*\})/);
-      const data = JSON.parse(jsonMatch ? jsonMatch[1] : rawText);
+      const data = JSON.parse(response.text || "{}");
       setResult(data);
     } catch (err) {
       console.error(err);
-      setError('분석 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+      setError(`오류: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
       setIsAnalyzing(false);
     }
