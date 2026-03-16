@@ -240,7 +240,7 @@ export default function App() {
     setResult(null);
 
     try {
-      const model = "gemini-3-flash-preview";
+      const model = "gemini-2.0-flash";
       const prompt = `
         당신은 레고 시장 분석 전문가입니다. 다음 레고 제품에 대한 심층적인 역사적 가격 및 중고 시장 분석을 수행해주세요.
         
