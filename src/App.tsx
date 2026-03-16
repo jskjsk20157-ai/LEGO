@@ -308,12 +308,13 @@ export default function App() {
         model: model,
         contents: prompt,
         config: {
-          responseMimeType: "application/json",
           tools: [{ googleSearch: {} }]
         }
       });
 
-      const data = JSON.parse(response.text || "{}");
+      const rawText = response.text || "{}";
+      const jsonMatch = rawText.match(/```json\s*([\s\S]*?)```/) || rawText.match(/(\{[\s\S]*\})/);
+      const data = JSON.parse(jsonMatch ? jsonMatch[1] : rawText);
       setResult(data);
     } catch (err) {
       console.error(err);
