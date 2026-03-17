@@ -375,42 +375,42 @@
 
 <script>
 const POPULAR_LEGO_SETS = [
-  { number: '10316', name: 'Rivendell (반지의 제왕: 리븐델)', image: 'https://images.brickset.com/sets/images/10316-1.jpg', year: '2023' },
-  { number: '10305', name: "Lion Knights' Castle (사자 기사의 성)", image: 'https://images.brickset.com/sets/images/10305-1.jpg', year: '2022' },
-  { number: '10302', name: 'Optimus Prime (옵티머스 프라임)', image: 'https://images.brickset.com/sets/images/10302-1.jpg', year: '2022' },
-  { number: '10294', name: 'Titanic (타이타닉)', image: 'https://images.brickset.com/sets/images/10294-1.jpg', year: '2021' },
-  { number: '10274', name: 'Ghostbusters ECTO-1 (고스트버스터즈 ECTO-1)', image: 'https://images.brickset.com/sets/images/10274-1.jpg', year: '2020' },
-  { number: '10276', name: 'Colosseum (콜로세움)', image: 'https://images.brickset.com/sets/images/10276-1.jpg', year: '2020' },
-  { number: '10281', name: 'Bonsai Tree (분재 나무)', image: 'https://images.brickset.com/sets/images/10281-1.jpg', year: '2021' },
-  { number: '10295', name: 'Porsche 911 (포르쉐 911)', image: 'https://images.brickset.com/sets/images/10295-1.jpg', year: '2021' },
-  { number: '10307', name: 'Eiffel Tower (에펠탑)', image: 'https://images.brickset.com/sets/images/10307-1.jpg', year: '2022' },
-  { number: '10326', name: 'Natural History Museum (자연사 박물관)', image: 'https://images.brickset.com/sets/images/10326-1.jpg', year: '2023' },
-  { number: '75192', name: 'Millennium Falcon (밀레니엄 팔콘 UCS)', image: 'https://images.brickset.com/sets/images/75192-1.jpg', year: '2017' },
-  { number: '75313', name: 'AT-AT (UCS)', image: 'https://images.brickset.com/sets/images/75313-1.jpg', year: '2021' },
-  { number: '75331', name: 'The Razor Crest (레이저 크레스트 UCS)', image: 'https://images.brickset.com/sets/images/75331-1.jpg', year: '2022' },
-  { number: '75341', name: "Luke Skywalker's Landspeeder (랜드스피더 UCS)", image: 'https://images.brickset.com/sets/images/75341-1.jpg', year: '2022' },
-  { number: '75252', name: 'Imperial Star Destroyer (스타 디스트로이어 UCS)', image: 'https://images.brickset.com/sets/images/75252-1.jpg', year: '2019' },
-  { number: '75308', name: 'R2-D2', image: 'https://images.brickset.com/sets/images/75308-1.jpg', year: '2021' },
-  { number: '75159', name: 'Death Star (데스 스타)', image: 'https://images.brickset.com/sets/images/75159-1.jpg', year: '2016' },
-  { number: '75367', name: 'Venator-Class Republic Attack Cruiser', image: 'https://images.brickset.com/sets/images/75367-1.jpg', year: '2023' },
-  { number: '42115', name: 'Lamborghini Sián FKP 37 (람보르기니 시안)', image: 'https://images.brickset.com/sets/images/42115-1.jpg', year: '2020' },
-  { number: '42143', name: 'Ferrari Daytona SP3 (페라리 데이토나)', image: 'https://images.brickset.com/sets/images/42143-1.jpg', year: '2022' },
-  { number: '42083', name: 'Bugatti Chiron (부가티 시론)', image: 'https://images.brickset.com/sets/images/42083-1.jpg', year: '2018' },
-  { number: '42110', name: 'Land Rover Defender (랜드로버 디펜더)', image: 'https://images.brickset.com/sets/images/42110-1.jpg', year: '2019' },
-  { number: '42141', name: 'McLaren Formula 1 Race Car (맥라렌 F1 레이스카)', image: 'https://images.brickset.com/sets/images/42141-1.jpg', year: '2022' },
-  { number: '21322', name: 'Pirates of Barracuda Bay (바라쿠다 해적들)', image: 'https://images.brickset.com/sets/images/21322-1.jpg', year: '2020' },
-  { number: '21323', name: 'Grand Piano (그랜드 피아노)', image: 'https://images.brickset.com/sets/images/21323-1.jpg', year: '2020' },
-  { number: '21325', name: 'Medieval Blacksmith (중세 대장간)', image: 'https://images.brickset.com/sets/images/21325-1.jpg', year: '2021' },
-  { number: '21327', name: 'Typewriter (타자기)', image: 'https://images.brickset.com/sets/images/21327-1.jpg', year: '2021' },
-  { number: '21333', name: 'The Starry Night (별이 빛나는 밤)', image: 'https://images.brickset.com/sets/images/21333-1.jpg', year: '2022' },
-  { number: '71043', name: 'Hogwarts Castle (호그와트 성)', image: 'https://images.brickset.com/sets/images/71043-1.jpg', year: '2018' },
-  { number: '75978', name: 'Diagon Alley (다이애건 앨리)', image: 'https://images.brickset.com/sets/images/75978-1.jpg', year: '2020' },
-  { number: '76405', name: "Hogwarts Express - Collectors' Edition", image: 'https://images.brickset.com/sets/images/76405-1.jpg', year: '2022' },
-  { number: '76417', name: 'Gringotts Wizarding Bank (그린고트 은행)', image: 'https://images.brickset.com/sets/images/76417-1.jpg', year: '2023' },
-  { number: '21058', name: 'Great Pyramid of Giza (기자의 대피라미드)', image: 'https://images.brickset.com/sets/images/21058-1.jpg', year: '2022' },
-  { number: '76178', name: 'Daily Bugle (데일리 뷰글)', image: 'https://images.brickset.com/sets/images/76178-1.jpg', year: '2021' },
-  { number: '76210', name: 'Hulkbuster (헐크버스터)', image: 'https://images.brickset.com/sets/images/76210-1.jpg', year: '2022' },
-  { number: '76269', name: 'Avengers Tower (어벤져스 타워)', image: 'https://images.brickset.com/sets/images/76269-1.jpg', year: '2023' },
+  { number: '10316', name: 'Rivendell (반지의 제왕: 리븐델)', image: 'https://images.brickset.com/sets/images/10316-1.jpg', year: '2023', pieces: 6167 },
+  { number: '10305', name: "Lion Knights' Castle (사자 기사의 성)", image: 'https://images.brickset.com/sets/images/10305-1.jpg', year: '2022', pieces: 4514 },
+  { number: '10302', name: 'Optimus Prime (옵티머스 프라임)', image: 'https://images.brickset.com/sets/images/10302-1.jpg', year: '2022', pieces: 1508 },
+  { number: '10294', name: 'Titanic (타이타닉)', image: 'https://images.brickset.com/sets/images/10294-1.jpg', year: '2021', pieces: 9090 },
+  { number: '10274', name: 'Ghostbusters ECTO-1 (고스트버스터즈 ECTO-1)', image: 'https://images.brickset.com/sets/images/10274-1.jpg', year: '2020', pieces: 2352 },
+  { number: '10276', name: 'Colosseum (콜로세움)', image: 'https://images.brickset.com/sets/images/10276-1.jpg', year: '2020', pieces: 9036 },
+  { number: '10281', name: 'Bonsai Tree (분재 나무)', image: 'https://images.brickset.com/sets/images/10281-1.jpg', year: '2021', pieces: 878 },
+  { number: '10295', name: 'Porsche 911 (포르쉐 911)', image: 'https://images.brickset.com/sets/images/10295-1.jpg', year: '2021', pieces: 1458 },
+  { number: '10307', name: 'Eiffel Tower (에펠탑)', image: 'https://images.brickset.com/sets/images/10307-1.jpg', year: '2022', pieces: 10001 },
+  { number: '10326', name: 'Natural History Museum (자연사 박물관)', image: 'https://images.brickset.com/sets/images/10326-1.jpg', year: '2023', pieces: 4014 },
+  { number: '75192', name: 'Millennium Falcon (밀레니엄 팔콘 UCS)', image: 'https://images.brickset.com/sets/images/75192-1.jpg', year: '2017', pieces: 7541 },
+  { number: '75313', name: 'AT-AT (UCS)', image: 'https://images.brickset.com/sets/images/75313-1.jpg', year: '2021', pieces: 6785 },
+  { number: '75331', name: 'The Razor Crest (레이저 크레스트 UCS)', image: 'https://images.brickset.com/sets/images/75331-1.jpg', year: '2022', pieces: 1023 },
+  { number: '75341', name: "Luke Skywalker's Landspeeder (랜드스피더 UCS)", image: 'https://images.brickset.com/sets/images/75341-1.jpg', year: '2022', pieces: 1890 },
+  { number: '75252', name: 'Imperial Star Destroyer (스타 디스트로이어 UCS)', image: 'https://images.brickset.com/sets/images/75252-1.jpg', year: '2019', pieces: 4784 },
+  { number: '75308', name: 'R2-D2', image: 'https://images.brickset.com/sets/images/75308-1.jpg', year: '2021', pieces: 2314 },
+  { number: '75159', name: 'Death Star (데스 스타)', image: 'https://images.brickset.com/sets/images/75159-1.jpg', year: '2016', pieces: 4016 },
+  { number: '75367', name: 'Venator-Class Republic Attack Cruiser', image: 'https://images.brickset.com/sets/images/75367-1.jpg', year: '2023', pieces: 5374 },
+  { number: '42115', name: 'Lamborghini Sián FKP 37 (람보르기니 시안)', image: 'https://images.brickset.com/sets/images/42115-1.jpg', year: '2020', pieces: 3696 },
+  { number: '42143', name: 'Ferrari Daytona SP3 (페라리 데이토나)', image: 'https://images.brickset.com/sets/images/42143-1.jpg', year: '2022', pieces: 3778 },
+  { number: '42083', name: 'Bugatti Chiron (부가티 시론)', image: 'https://images.brickset.com/sets/images/42083-1.jpg', year: '2018', pieces: 3599 },
+  { number: '42110', name: 'Land Rover Defender (랜드로버 디펜더)', image: 'https://images.brickset.com/sets/images/42110-1.jpg', year: '2019', pieces: 2573 },
+  { number: '42141', name: 'McLaren Formula 1 Race Car (맥라렌 F1 레이스카)', image: 'https://images.brickset.com/sets/images/42141-1.jpg', year: '2022', pieces: 1432 },
+  { number: '21322', name: 'Pirates of Barracuda Bay (바라쿠다 해적들)', image: 'https://images.brickset.com/sets/images/21322-1.jpg', year: '2020', pieces: 2545 },
+  { number: '21323', name: 'Grand Piano (그랜드 피아노)', image: 'https://images.brickset.com/sets/images/21323-1.jpg', year: '2020', pieces: 3662 },
+  { number: '21325', name: 'Medieval Blacksmith (중세 대장간)', image: 'https://images.brickset.com/sets/images/21325-1.jpg', year: '2021', pieces: 2164 },
+  { number: '21327', name: 'Typewriter (타자기)', image: 'https://images.brickset.com/sets/images/21327-1.jpg', year: '2021', pieces: 2079 },
+  { number: '21333', name: 'The Starry Night (별이 빛나는 밤)', image: 'https://images.brickset.com/sets/images/21333-1.jpg', year: '2022', pieces: 1552 },
+  { number: '71043', name: 'Hogwarts Castle (호그와트 성)', image: 'https://images.brickset.com/sets/images/71043-1.jpg', year: '2018', pieces: 6020 },
+  { number: '75978', name: 'Diagon Alley (다이애건 앨리)', image: 'https://images.brickset.com/sets/images/75978-1.jpg', year: '2020', pieces: 5544 },
+  { number: '76405', name: "Hogwarts Express - Collectors' Edition", image: 'https://images.brickset.com/sets/images/76405-1.jpg', year: '2022', pieces: 5129 },
+  { number: '76417', name: 'Gringotts Wizarding Bank (그린고트 은행)', image: 'https://images.brickset.com/sets/images/76417-1.jpg', year: '2023', pieces: 4803 },
+  { number: '21058', name: 'Great Pyramid of Giza (기자의 대피라미드)', image: 'https://images.brickset.com/sets/images/21058-1.jpg', year: '2022', pieces: 1476 },
+  { number: '76178', name: 'Daily Bugle (데일리 뷰글)', image: 'https://images.brickset.com/sets/images/76178-1.jpg', year: '2021', pieces: 3772 },
+  { number: '76210', name: 'Hulkbuster (헐크버스터)', image: 'https://images.brickset.com/sets/images/76210-1.jpg', year: '2022', pieces: 4049 },
+  { number: '76269', name: 'Avengers Tower (어벤져스 타워)', image: 'https://images.brickset.com/sets/images/76269-1.jpg', year: '2023', pieces: 5201 },
 ];
 
 const DEFAULT_API_KEY = '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';
@@ -471,13 +471,19 @@ function sanitizeResult(r) {
 function sanitizeHistory(arr) {
   if (!Array.isArray(arr)) return [];
   return arr
-    .map(d => ({
-      date: String(d?.date || '').trim(),
-      price: Number(String(d?.price || '').replace(/[^0-9.]/g, '')),
-      mall: String(d?.mall || '').trim(),
-      discountRate: Math.max(0, Number(d?.discountRate) || 0),
-    }))
-    .filter(d => /^\d{4}-\d{1,2}/.test(d.date) && Number.isFinite(d.price) && d.price > 0);
+    .map(d => {
+      const raw = String(d?.date || '').trim();
+      // YYYY-MM, YYYY-M, YYYY.MM, YYYY/MM 등 다양한 형식 허용
+      const m = raw.match(/(\d{4})[-./년\s](\d{1,2})/);
+      const date = m ? `${m[1]}-${m[2].padStart(2, '0')}` : null;
+      return {
+        date,
+        price: Number(String(d?.price || '').replace(/[^0-9.]/g, '')),
+        mall: String(d?.mall || '').trim(),
+        discountRate: Math.max(0, Number(d?.discountRate) || 0),
+      };
+    })
+    .filter(d => d.date && Number.isFinite(d.price) && d.price > 0);
 }
 
 // 카테고리 매핑
@@ -717,8 +723,11 @@ function renderResults(r, setNumber, currentPrice) {
   // Scores
   document.getElementById('investmentScore').textContent = r.investmentScore;
   document.getElementById('investmentReason').textContent = r.investmentReason;
-  document.getElementById('pppValue').textContent = `₩${r.ppp}`;
-  document.getElementById('pieceCount').textContent = `총 부품 수: ${(r.pieceCount||0).toLocaleString()} pcs`;
+  // 로컬 데이터 우선, 없으면 AI 값 사용
+  const knownPieces = matched?.pieces || r.pieceCount;
+  const ppp = knownPieces > 0 ? Math.round((r.originalPrice || 0) / knownPieces) : r.ppp;
+  document.getElementById('pppValue').textContent = `₩${ppp}`;
+  document.getElementById('pieceCount').textContent = knownPieces > 0 ? `총 부품 수: ${knownPieces.toLocaleString()} pcs` : '';
 
   // Retirement
   const riskMap = {
