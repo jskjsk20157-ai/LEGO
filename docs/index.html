@@ -11,6 +11,20 @@
     .animate-spin { animation: spin 1s linear infinite; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     .fade-in { animation: fadeIn 0.4s ease-out; }
+
+    /* 스켈레톤 걷기 */
+    @keyframes walk { 0%,100%{transform:translateX(-80px)} 50%{transform:translateX(calc(100vw + 80px))} }
+    @keyframes legL  { 0%,100%{transform:rotate(-30deg)} 50%{transform:rotate(30deg)} }
+    @keyframes legR  { 0%,100%{transform:rotate(30deg)}  50%{transform:rotate(-30deg)} }
+    @keyframes armL  { 0%,100%{transform:rotate(30deg)}  50%{transform:rotate(-30deg)} }
+    @keyframes armR  { 0%,100%{transform:rotate(-30deg)} 50%{transform:rotate(30deg)} }
+    @keyframes bob   { 0%,100%{transform:translateY(0)}  50%{transform:translateY(-4px)} }
+    .skeleton-walk { animation: walk 3s linear infinite; }
+    .skeleton-bob  { animation: bob 0.5s ease-in-out infinite; }
+    .leg-l  { transform-origin: top center; animation: legL 0.5s ease-in-out infinite; }
+    .leg-r  { transform-origin: top center; animation: legR 0.5s ease-in-out infinite; }
+    .arm-l  { transform-origin: top center; animation: armL 0.5s ease-in-out infinite; }
+    .arm-r  { transform-origin: top center; animation: armR 0.5s ease-in-out infinite; }
   </style>
 </head>
 <body class="min-h-screen bg-[#FFF9E5] text-[#202124] font-sans">
@@ -44,6 +58,43 @@
           class="flex-1 bg-transparent outline-none text-sm font-bold text-amber-900 placeholder-amber-400"/>
         <button onclick="saveApiKey()" class="px-3 py-1 bg-amber-500 text-white rounded-lg text-xs font-black hover:bg-amber-600 transition-colors">저장</button>
       </div>
+    </div>
+
+    <!-- Category Buttons -->
+    <div class="mb-4 flex flex-wrap gap-2">
+      <button onclick="filterCategory(null)" id="cat_all"
+        class="px-4 py-2 rounded-full text-xs font-black border-2 border-[#e53935] bg-[#e53935] text-white transition-all">
+        전체
+      </button>
+      <button onclick="filterCategory('icons')" id="cat_icons"
+        class="px-4 py-2 rounded-full text-xs font-black border-2 border-[#dadce0] bg-white text-[#3c4043] hover:border-[#e53935] transition-all">
+        🏛️ 아이콘
+      </button>
+      <button onclick="filterCategory('starwars')" id="cat_starwars"
+        class="px-4 py-2 rounded-full text-xs font-black border-2 border-[#dadce0] bg-white text-[#3c4043] hover:border-[#e53935] transition-all">
+        ⚔️ 스타워즈
+      </button>
+      <button onclick="filterCategory('technic')" id="cat_technic"
+        class="px-4 py-2 rounded-full text-xs font-black border-2 border-[#dadce0] bg-white text-[#3c4043] hover:border-[#e53935] transition-all">
+        🔧 테크닉
+      </button>
+      <button onclick="filterCategory('ideas')" id="cat_ideas"
+        class="px-4 py-2 rounded-full text-xs font-black border-2 border-[#dadce0] bg-white text-[#3c4043] hover:border-[#e53935] transition-all">
+        💡 아이디어
+      </button>
+      <button onclick="filterCategory('harrypotter')" id="cat_harrypotter"
+        class="px-4 py-2 rounded-full text-xs font-black border-2 border-[#dadce0] bg-white text-[#3c4043] hover:border-[#e53935] transition-all">
+        ⚡ 해리포터
+      </button>
+      <button onclick="filterCategory('marvel')" id="cat_marvel"
+        class="px-4 py-2 rounded-full text-xs font-black border-2 border-[#dadce0] bg-white text-[#3c4043] hover:border-[#e53935] transition-all">
+        🦸 마블
+      </button>
+    </div>
+
+    <!-- Category Set Grid -->
+    <div id="categoryGrid" class="hidden mb-6 bg-white/80 rounded-[2rem] border-2 border-[#dadce0] p-4 shadow-sm">
+      <div id="categoryList" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
     </div>
 
     <!-- Search Section -->
@@ -89,6 +140,58 @@
         분석 시작하기
       </button>
     </section>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="hidden fixed inset-0 z-40 bg-[#FFF9E5]/90 flex flex-col items-center justify-center gap-6">
+      <div class="overflow-hidden w-full relative h-24">
+        <div class="skeleton-walk absolute bottom-0">
+          <div class="skeleton-bob">
+            <svg width="60" height="90" viewBox="0 0 60 90" fill="none">
+              <!-- 머리 -->
+              <ellipse cx="30" cy="10" rx="9" ry="10" fill="white" stroke="#ccc" stroke-width="1.5"/>
+              <!-- 눈 -->
+              <ellipse cx="26" cy="9" rx="2" ry="2.5" fill="#222"/>
+              <ellipse cx="34" cy="9" rx="2" ry="2.5" fill="#222"/>
+              <!-- 코뼈 -->
+              <path d="M29 13 L31 13 L30 16 Z" fill="#aaa"/>
+              <!-- 이빨 -->
+              <rect x="24" y="16" width="4" height="3" rx="0.5" fill="white" stroke="#bbb" stroke-width="0.5"/>
+              <rect x="29" y="16" width="4" height="3" rx="0.5" fill="white" stroke="#bbb" stroke-width="0.5"/>
+              <!-- 몸통 -->
+              <rect x="22" y="22" width="16" height="22" rx="3" fill="white" stroke="#ccc" stroke-width="1.5"/>
+              <!-- 갈비뼈 -->
+              <path d="M25 27 Q22 29 25 31" stroke="#ccc" stroke-width="1" fill="none"/>
+              <path d="M35 27 Q38 29 35 31" stroke="#ccc" stroke-width="1" fill="none"/>
+              <path d="M25 32 Q22 34 25 36" stroke="#ccc" stroke-width="1" fill="none"/>
+              <path d="M35 32 Q38 34 35 36" stroke="#ccc" stroke-width="1" fill="none"/>
+              <!-- 팔 왼쪽 -->
+              <g class="arm-l" style="transform-box:fill-box;">
+                <rect x="10" y="22" width="10" height="5" rx="2.5" fill="white" stroke="#ccc" stroke-width="1.5"/>
+                <rect x="8" y="27" width="8" height="14" rx="2" fill="white" stroke="#ccc" stroke-width="1.5"/>
+              </g>
+              <!-- 팔 오른쪽 -->
+              <g class="arm-r" style="transform-box:fill-box;">
+                <rect x="40" y="22" width="10" height="5" rx="2.5" fill="white" stroke="#ccc" stroke-width="1.5"/>
+                <rect x="44" y="27" width="8" height="14" rx="2" fill="white" stroke="#ccc" stroke-width="1.5"/>
+              </g>
+              <!-- 골반 -->
+              <rect x="23" y="44" width="14" height="6" rx="3" fill="white" stroke="#ccc" stroke-width="1.5"/>
+              <!-- 다리 왼쪽 -->
+              <g class="leg-l" style="transform-box:fill-box;">
+                <rect x="23" y="50" width="8" height="20" rx="3" fill="white" stroke="#ccc" stroke-width="1.5"/>
+                <rect x="22" y="68" width="10" height="6" rx="2" fill="white" stroke="#ccc" stroke-width="1.5"/>
+              </g>
+              <!-- 다리 오른쪽 -->
+              <g class="leg-r" style="transform-box:fill-box;">
+                <rect x="29" y="50" width="8" height="20" rx="3" fill="white" stroke="#ccc" stroke-width="1.5"/>
+                <rect x="28" y="68" width="10" height="6" rx="2" fill="white" stroke="#ccc" stroke-width="1.5"/>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <p class="text-sm font-black text-[#70757a]">분석 중이에요...</p>
+    </div>
 
     <!-- Results -->
     <div id="results" class="hidden space-y-8">
@@ -356,6 +459,53 @@ let currentPeriod = 'all';
 let currentUsedCat = 'misb';
 let priceChart = null;
 
+// 카테고리 매핑
+const CATEGORIES = {
+  icons:       s => ['10316','10305','10302','10294','10274','10276','10281','10295','10307','10326'].includes(s.number),
+  starwars:    s => ['75192','75313','75331','75341','75252','75308','75159','75367'].includes(s.number),
+  technic:     s => ['42115','42143','42083','42110','42141'].includes(s.number),
+  ideas:       s => ['21322','21323','21325','21327','21333'].includes(s.number),
+  harrypotter: s => ['71043','75978','76391','76405','76417'].includes(s.number),
+  marvel:      s => ['76178','76210','76269'].includes(s.number),
+};
+
+function filterCategory(cat) {
+  // 버튼 스타일 업데이트
+  const all = ['all','icons','starwars','technic','ideas','harrypotter','marvel'];
+  all.forEach(c => {
+    const btn = document.getElementById(`cat_${c}`);
+    if (!btn) return;
+    const active = (cat === null && c === 'all') || c === cat;
+    btn.className = `px-4 py-2 rounded-full text-xs font-black border-2 transition-all ${
+      active ? 'border-[#e53935] bg-[#e53935] text-white' : 'border-[#dadce0] bg-white text-[#3c4043] hover:border-[#e53935]'
+    }`;
+  });
+
+  const grid = document.getElementById('categoryGrid');
+  if (!cat) { grid.classList.add('hidden'); return; }
+
+  const sets = POPULAR_LEGO_SETS.filter(CATEGORIES[cat] || (() => false));
+  document.getElementById('categoryList').innerHTML = sets.map(s => `
+    <button onclick="selectFromCategory('${s.number}')"
+      class="bg-[#f8f9fa] rounded-2xl p-3 border-2 border-transparent hover:border-[#e53935] active:bg-red-50 transition-all text-left">
+      <div class="aspect-square bg-white rounded-xl mb-2 overflow-hidden">
+        <img src="${s.image}" alt="${s.name}" class="w-full h-full object-contain p-1"
+          onerror="this.src='https://via.placeholder.com/80'" referrerpolicy="no-referrer"/>
+      </div>
+      <div class="text-[10px] font-black text-[#e53935]">${s.number}</div>
+      <div class="text-[11px] font-bold text-[#3c4043] truncate">${s.name}</div>
+      ${s.year ? `<div class="text-[9px] text-[#70757a]">${s.year}</div>` : ''}
+    </button>
+  `).join('');
+  grid.classList.remove('hidden');
+}
+
+function selectFromCategory(number) {
+  document.getElementById('setNumberInput').value = number;
+  document.getElementById('categoryGrid').classList.add('hidden');
+  document.querySelector('#searchSection')?.scrollIntoView({ behavior: 'smooth' });
+}
+
 // API Key
 function resetApiKey() {
   localStorage.removeItem('gemini_api_key');
@@ -433,9 +583,10 @@ async function analyzeLego() {
 
   const btn = document.getElementById('analyzeBtn');
   btn.disabled = true;
-  btn.innerHTML = `<svg class="w-6 h-6 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>&nbsp;분석 중...`;
+  btn.innerHTML = `분석 중...`;
   showError(null);
   document.getElementById('results').classList.add('hidden');
+  document.getElementById('loadingOverlay').classList.remove('hidden');
 
   const prompt = `당신은 레고 시장 분석 전문가입니다. 레고 제품 번호 ${setNumber}, 현재 판매가 ${currentPrice}원에 대해 심층 분석해주세요.
 
@@ -521,6 +672,7 @@ async function analyzeLego() {
   } finally {
     btn.disabled = false;
     btn.innerHTML = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> 분석 시작하기`;
+    document.getElementById('loadingOverlay').classList.add('hidden');
   }
 }
 
