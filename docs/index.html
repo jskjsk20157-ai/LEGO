@@ -143,50 +143,56 @@
 
     <!-- Loading Overlay -->
     <div id="loadingOverlay" class="hidden fixed inset-0 z-40 bg-[#FFF9E5]/90 flex flex-col items-center justify-center gap-6">
-      <div class="overflow-hidden w-full relative h-24">
+      <div class="overflow-hidden w-full relative h-32">
         <div class="skeleton-walk absolute bottom-0">
           <div class="skeleton-bob">
-            <svg width="55" height="90" viewBox="0 0 55 90" fill="none">
-              <!-- 두개골 (옆모습, 오른쪽 방향) -->
-              <ellipse cx="32" cy="11" rx="11" ry="12" fill="white" stroke="#ccc" stroke-width="1.5"/>
-              <!-- 눈구멍 (하나) -->
-              <ellipse cx="38" cy="9" rx="3" ry="3.5" fill="#333"/>
-              <!-- 코뼈 (옆면) -->
-              <path d="M41 13 L45 15 L43 18" stroke="#bbb" fill="none" stroke-width="1.5" stroke-linecap="round"/>
-              <!-- 이빨 (옆면) -->
-              <rect x="37" y="19" width="3.5" height="3.5" rx="0.5" fill="white" stroke="#bbb" stroke-width="0.5"/>
-              <rect x="40.5" y="19" width="3.5" height="3.5" rx="0.5" fill="white" stroke="#bbb" stroke-width="0.5"/>
+            <svg width="70" height="112" viewBox="0 0 70 112" fill="none">
+              <!-- 머리 스터드 -->
+              <ellipse cx="34" cy="4" rx="6.5" ry="3.5" fill="#ECEADF" stroke="#bbb" stroke-width="1"/>
+              <rect x="27.5" y="4" width="13" height="3" fill="#ECEADF"/>
+              <!-- 머리 (둥근 미니피그) -->
+              <circle cx="34" cy="18" r="14" fill="#F2EEE3" stroke="#ccc" stroke-width="1.5"/>
+              <!-- 눈구멍 (크고 검정) -->
+              <ellipse cx="41" cy="15" rx="6" ry="6.5" fill="#1C1C1C"/>
+              <!-- 이빨 -->
+              <rect x="38" y="27" width="3" height="3.5" rx="0.5" fill="#F2EEE3" stroke="#aaa" stroke-width="0.5"/>
+              <rect x="41" y="27" width="3" height="3.5" rx="0.5" fill="#F2EEE3" stroke="#aaa" stroke-width="0.5"/>
+              <rect x="44" y="27" width="3" height="3.5" rx="0.5" fill="#F2EEE3" stroke="#aaa" stroke-width="0.5"/>
               <!-- 목 -->
-              <rect x="28" y="23" width="7" height="5" rx="1" fill="white" stroke="#ccc" stroke-width="1"/>
-              <!-- 뒷팔 (흐리게) -->
+              <rect x="28" y="32" width="12" height="5" rx="2" fill="#ECEADF" stroke="#ccc" stroke-width="1"/>
+              <!-- 뒷팔 (흐린 색) -->
               <g class="arm-b" style="transform-box:fill-box;">
-                <rect x="23" y="28" width="5" height="13" rx="2" fill="#e8e8e8" stroke="#ccc" stroke-width="1"/>
-                <rect x="22" y="40" width="5" height="10" rx="2" fill="#e8e8e8" stroke="#ccc" stroke-width="1"/>
+                <ellipse cx="24" cy="44" rx="4.5" ry="9" fill="#DEDAD0" stroke="#bbb" stroke-width="1"/>
+                <ellipse cx="22" cy="58" rx="3.5" ry="7" fill="#DEDAD0" stroke="#bbb" stroke-width="1"/>
               </g>
-              <!-- 몸통 (옆면) -->
-              <rect x="22" y="28" width="13" height="21" rx="2" fill="white" stroke="#ccc" stroke-width="1.5"/>
-              <!-- 척추 -->
-              <line x1="26" y1="29" x2="26" y2="48" stroke="#ddd" stroke-width="1"/>
-              <!-- 갈비뼈 (옆면) -->
-              <path d="M26 33 L34 32" stroke="#ccc" stroke-width="1"/>
-              <path d="M26 37 L34 36" stroke="#ccc" stroke-width="1"/>
-              <path d="M26 41 L34 40" stroke="#ccc" stroke-width="1"/>
+              <!-- 흉곽 등쪽 (척추) -->
+              <rect x="22" y="37" width="8" height="24" rx="3" fill="#F2EEE3" stroke="#ccc" stroke-width="1.5"/>
+              <!-- 갈비뼈 아치 1 -->
+              <path d="M28 41 Q44 40 45 45 Q45 50 28 51" stroke="#ccc" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <!-- 갈비뼈 아치 2 -->
+              <path d="M28 52 Q43 51 44 56 Q44 60 28 60" stroke="#ccc" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               <!-- 앞팔 -->
               <g class="arm-f" style="transform-box:fill-box;">
-                <rect x="28" y="28" width="5" height="13" rx="2" fill="white" stroke="#ccc" stroke-width="1.5"/>
-                <rect x="29" y="40" width="5" height="10" rx="2" fill="white" stroke="#ccc" stroke-width="1.5"/>
+                <ellipse cx="33" cy="44" rx="4.5" ry="9" fill="#F2EEE3" stroke="#ccc" stroke-width="1.5"/>
+                <ellipse cx="35" cy="58" rx="3.5" ry="7" fill="#F2EEE3" stroke="#ccc" stroke-width="1.5"/>
               </g>
               <!-- 골반 -->
-              <rect x="21" y="49" width="15" height="7" rx="2" fill="white" stroke="#ccc" stroke-width="1.5"/>
-              <!-- 뒷다리 (흐리게) -->
+              <path d="M20 62 Q29 66 40 62 L39 69 Q29 72 21 69 Z" fill="#F2EEE3" stroke="#ccc" stroke-width="1.5"/>
+              <!-- 뒷다리 (흐린 색) -->
               <g class="leg-b" style="transform-box:fill-box;">
-                <rect x="21" y="56" width="9" height="20" rx="2" fill="#e8e8e8" stroke="#ccc" stroke-width="1"/>
-                <rect x="19" y="74" width="13" height="6" rx="2" fill="#e8e8e8" stroke="#ccc" stroke-width="1"/>
+                <ellipse cx="26" cy="80" rx="5" ry="10" fill="#DEDAD0" stroke="#bbb" stroke-width="1"/>
+                <ellipse cx="25" cy="95" rx="4" ry="7" fill="#DEDAD0" stroke="#bbb" stroke-width="1"/>
+                <line x1="18" y1="101" x2="22" y2="106" stroke="#bbb" stroke-width="2" stroke-linecap="round"/>
+                <line x1="25" y1="101" x2="25" y2="107" stroke="#bbb" stroke-width="2" stroke-linecap="round"/>
+                <line x1="32" y1="101" x2="28" y2="106" stroke="#bbb" stroke-width="2" stroke-linecap="round"/>
               </g>
               <!-- 앞다리 -->
               <g class="leg-f" style="transform-box:fill-box;">
-                <rect x="24" y="56" width="9" height="20" rx="2" fill="white" stroke="#ccc" stroke-width="1.5"/>
-                <rect x="22" y="74" width="14" height="6" rx="2" fill="white" stroke="#ccc" stroke-width="1.5"/>
+                <ellipse cx="31" cy="80" rx="5" ry="10" fill="#F2EEE3" stroke="#ccc" stroke-width="1.5"/>
+                <ellipse cx="30" cy="95" rx="4" ry="7" fill="#F2EEE3" stroke="#ccc" stroke-width="1.5"/>
+                <line x1="22" y1="101" x2="26" y2="106" stroke="#ccc" stroke-width="2" stroke-linecap="round"/>
+                <line x1="30" y1="101" x2="30" y2="107" stroke="#ccc" stroke-width="2" stroke-linecap="round"/>
+                <line x1="38" y1="101" x2="34" y2="106" stroke="#ccc" stroke-width="2" stroke-linecap="round"/>
               </g>
             </svg>
           </div>
