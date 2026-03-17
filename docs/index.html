@@ -47,7 +47,7 @@
         <svg class="w-5 h-5 text-amber-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
         </svg>
-        <input type="password" id="apiKeyInput" placeholder="Gemini API Key 입력 (자동 저장됩니다)"
+        <input type="password" id="apiKeyInput" placeholder="API Key 입력 (Gemini: AIza... / Groq: gsk_...)"
           class="flex-1 bg-transparent outline-none text-sm font-bold text-amber-900 placeholder-amber-400"/>
         <button onclick="saveApiKey()" class="px-3 py-1 bg-amber-500 text-white rounded-lg text-xs font-black hover:bg-amber-600 transition-colors">저장</button>
       </div>
@@ -410,7 +410,7 @@ async function analyzeLego() {
   const apiKey = getApiKey();
   if (!apiKey) {
     document.getElementById('apiKeySection').classList.remove('hidden');
-    showError('Gemini API Key를 먼저 입력해주세요.');
+    showError('API Key를 먼저 입력해주세요. (Gemini 또는 Groq)');
     return;
   }
 
@@ -458,23 +458,39 @@ async function analyzeLego() {
 한국어로 답변. historicalData와 historicalDataUsed는 최소 10개 이상 포함.`;
 
   try {
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-      {
+    const isGroq = apiKey.startsWith('gsk_');
+    let text;
+
+    if (isGroq) {
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { responseMimeType: 'application/json' }
+          model: 'llama-3.3-70b-versatile',
+          messages: [{ role: 'user', content: prompt }],
+          response_format: { type: 'json_object' }
         })
-      }
-    );
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error?.message || `HTTP ${res.status}`);
+      });
+      if (!res.ok) { const err = await res.json(); throw new Error(err.error?.message || `HTTP ${res.status}`); }
+      const data = await res.json();
+      text = data.choices?.[0]?.message?.content;
+    } else {
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { responseMimeType: 'application/json' }
+          })
+        }
+      );
+      if (!res.ok) { const err = await res.json(); throw new Error(err.error?.message || `HTTP ${res.status}`); }
+      const data = await res.json();
+      text = data.candidates?.[0]?.content?.parts?.[0]?.text;
     }
-    const data = await res.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
     if (!text) throw new Error('빈 응답을 받았습니다.');
     currentResult = JSON.parse(text);
     renderResults(currentResult, setNumber, currentPrice);
