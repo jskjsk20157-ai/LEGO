@@ -93,6 +93,21 @@
     <!-- Results -->
     <div id="results" class="hidden space-y-8">
 
+      <!-- Product Info -->
+      <div id="productInfo" class="bg-white/90 rounded-[2rem] border-2 border-[#dadce0] p-6 shadow-sm flex items-center gap-6">
+        <div class="w-24 h-24 bg-[#f8f9fa] rounded-2xl overflow-hidden flex-shrink-0 border-2 border-[#dadce0]">
+          <img id="productImage" src="" alt="" class="w-full h-full object-contain p-2" onerror="this.src='https://via.placeholder.com/96'"/>
+        </div>
+        <div>
+          <div id="productNumber" class="text-xs font-black text-[#e53935] mb-1"></div>
+          <div id="productName" class="text-lg font-black text-[#3c4043] leading-tight"></div>
+          <div class="mt-2 inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 rounded-full text-[11px] font-black text-emerald-700 border border-emerald-200">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+            분석 완료
+          </div>
+        </div>
+      </div>
+
       <!-- Tabs -->
       <div class="flex gap-2 bg-[#f1f3f4]/50 p-1.5 rounded-2xl border-2 border-[#dadce0]">
         <button id="tabNew" onclick="setTab('new')"
@@ -505,6 +520,13 @@ async function analyzeLego() {
 }
 
 function renderResults(r, setNumber, currentPrice) {
+  // Product Info
+  const matched = POPULAR_LEGO_SETS.find(s => s.number === setNumber);
+  document.getElementById('productNumber').textContent = `No. ${setNumber}`;
+  document.getElementById('productName').textContent = matched?.name || `LEGO ${setNumber}`;
+  document.getElementById('productImage').src = matched?.image || `https://images.brickset.com/sets/images/${setNumber}-1.jpg`;
+  document.getElementById('productImage').alt = matched?.name || `LEGO ${setNumber}`;
+
   // Scores
   document.getElementById('investmentScore').textContent = r.investmentScore;
   document.getElementById('investmentReason').textContent = r.investmentReason;
