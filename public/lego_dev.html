@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>현명하게 레고하기</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .animate-spin { animation: spin 1s linear infinite; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-in { animation: fadeIn 0.4s ease-out; }
+
+
+    /* 정가 자동입력 스타일 */
+    .price-autofill { color: #aaa !important; }
+  </style>
+</head>
+<body class="min-h-screen bg-[#FFF9E5] text-[#202124] font-sans">
+
+  <!-- Header -->
+  <header class="bg-[#e53935] sticky top-0 z-50 shadow-sm">
+    <div class="max-w-4xl mx-auto px-4 h-20 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 bg-white/80 rounded-xl flex items-center justify-center shadow-sm">
+          <svg class="w-7 h-7 text-[#e53935]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-2xl font-black tracking-tight text-white">현명하게 레고하기</h1>
+          <div class="text-[10px] font-bold text-white/70 uppercase tracking-[0.2em]">SMART BRICK ADVISOR</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto px-4 py-10">
+
+    <!-- API Key Section (hidden by default) -->
+    <div id="apiKeySection" class="hidden mb-6">
+      <div class="bg-amber-50 border-2 border-amber-200 rounded-2xl p-4 flex items-center gap-3">
+        <svg class="w-5 h-5 text-amber-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+        </svg>
+        <input type="password" id="apiKeyInput" placeholder="API Key 입력 (Groq: gsk_... / Gemini: AIza...)"
+          class="flex-1 bg-transparent outline-none text-sm font-bold text-amber-900 placeholder-amber-400"/>
+        <button onclick="saveApiKey()" class="px-3 py-1 bg-amber-500 text-white rounded-lg text-xs font-black hover:bg-amber-600 transition-colors">저장</button>
+      </div>
+    </div>
+
+    <!-- Category Buttons -->
+    <div class="mb-4 flex flex-wrap gap-2">
+      <button onclick="filterCategory(null)" id="cat_all"
+        class="px-4 py-2 rounded-full text-xs font-black border-2 border-[#e53935] bg-[#e53935] text-white transition-all">
+        전체
+      </button>
+      <button onclick="filterCategory('icons')" id="cat_icons"
+        class="px-4 py-2 rounded-full text-xs font-black border-2 border-[#dadce0] bg-white text-[#3c4043] hover:border-[#e53935] transition-all">
+        🏛️ 아이콘
+      </button>
+      <button onclick="filterCategory('starwars')" id="cat_starwars"
+        class="px-4 py-2 rounded-full text-xs font-black border-2 border-[#dadce0] bg-white text-[#3c4043] hover:border-[#e53935] transition-all">
+        ⚔️ 스타워즈
+      </button>
+      <button onclick="filterCategory('technic')" id="cat_technic"
+        class="px-4 py-2 rounded-full text-xs font-black border-2 border-[#dadce0] bg-white text-[#3c4043] hover:border-[#e53935] transition-all">
+        🔧 테크닉
+      </button>
+      <button onclick="filterCategory('ideas')" id="cat_ideas"
+        class="px-4 py-2 rounded-full text-xs font-black border-2 border-[#dadce0] bg-white text-[#3c4043] hover:border-[#e53935] transition-all">
+        💡 아이디어
+      </button>
+      <button onclick="filterCategory('harrypotter')" id="cat_harrypotter"
+        class="px-4 py-2 rounded-full text-xs font-black border-2 border-[#dadce0] bg-white text-[#3c4043] hover:border-[#e53935] transition-all">
+        ⚡ 해리포터
+      </button>
+      <button onclick="filterCategory('marvel')" id="cat_marvel"
+        class="px-4 py-2 rounded-full text-xs font-black border-2 border-[#dadce0] bg-white text-[#3c4043] hover:border-[#e53935] transition-all">
+        🦸 마블
+      </button>
+    </div>
+
+    <!-- Category Set Grid -->
+    <div id="categoryGrid" class="hidden mb-6 bg-white/80 rounded-[2rem] border-2 border-[#dadce0] p-4 shadow-sm">
+      <div id="categoryList" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
+    </div>
+
+    <!-- Search Section -->
+    <section class="bg-white/80 rounded-[2rem] border-2 border-[#dadce0] p-8 mb-8 shadow-sm">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div class="relative">
+          <label class="block text-xs font-black text-[#70757a] uppercase mb-2 ml-4">제품 번호</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-5 flex items-center pointer-events-none">
+              <svg class="w-5 h-5 text-[#e53935]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+            </div>
+            <input type="text" id="setNumberInput" placeholder="예: 10316"
+              class="w-full pl-14 pr-6 py-4 bg-[#f8f9fa] border-2 border-[#dadce0] rounded-2xl focus:outline-none focus:ring-4 focus:ring-yellow-200 focus:border-[#e53935] transition-all text-lg font-bold"
+              oninput="handleSetInput()" onblur="hideSuggestions()" onfocus="handleSetInput()"/>
+            <div id="suggestions" class="hidden absolute top-full left-0 right-0 mt-3 bg-white border-2 border-[#dadce0] rounded-2xl shadow-xl z-[60] overflow-hidden">
+              <div id="suggestionsList"></div>
+            </div>
+          </div>
+        </div>
+        <div class="relative">
+          <label class="block text-xs font-black text-[#70757a] uppercase mb-2 ml-4">현재 판매가</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-5 flex items-center pointer-events-none">
+              <svg class="w-5 h-5 text-[#42a5f5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/>
+              </svg>
+            </div>
+            <input type="number" id="priceInput" placeholder="원 단위 입력"
+              class="w-full pl-14 pr-6 py-4 bg-[#f8f9fa] border-2 border-[#dadce0] rounded-2xl focus:outline-none focus:ring-4 focus:ring-yellow-200 focus:border-[#42a5f5] transition-all text-lg font-bold"/>
+          </div>
+        </div>
+      </div>
+
+      <div id="errorBox" class="hidden mb-4 bg-red-50 border-2 border-red-200 rounded-2xl p-4 text-red-700 font-bold text-sm break-all"></div>
+
+      <button id="analyzeBtn" onclick="analyzeLego()"
+        class="w-full bg-[#e53935] hover:bg-[#d32f2f] text-white font-black py-5 rounded-2xl transition-all flex items-center justify-center gap-3 text-xl shadow-md">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        분석 시작하기
+      </button>
+    </section>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="hidden fixed inset-0 z-40 bg-[#FFF9E5]/90 flex flex-col items-center justify-center gap-6">
+      <div class="flex justify-center">
+        <canvas id="skeletonCanvas" width="320" height="320" style="width:200px;height:200px;"></canvas>
+        <video id="skeletonVideo" autoplay loop muted playsinline style="display:none;">
+          <source src="skeleton.mp4" type="video/mp4">
+        </video>
+      </div>
+      <p class="text-sm font-black text-[#70757a]">분석 중이에요...</p>
+    </div>
+
+    <!-- Results -->
+    <div id="results" class="hidden space-y-8">
+
+      <!-- Product Info -->
+      <div id="productInfo" class="bg-white/90 rounded-[2rem] border-2 border-[#dadce0] p-6 shadow-sm flex items-center gap-6">
+        <div class="w-24 h-24 bg-[#f8f9fa] rounded-2xl overflow-hidden flex-shrink-0 border-2 border-[#dadce0]">
+          <img id="productImage" src="" alt="" class="w-full h-full object-contain p-2" onerror="this.src='https://via.placeholder.com/96'"/>
+        </div>
+        <div>
+          <div id="productNumber" class="text-xs font-black text-[#e53935] mb-1"></div>
+          <div id="productName" class="text-lg font-black text-[#3c4043] leading-tight"></div>
+          <div class="mt-2 inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 rounded-full text-[11px] font-black text-emerald-700 border border-emerald-200">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+            분석 완료
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="flex gap-2 bg-[#f1f3f4]/50 p-1.5 rounded-2xl border-2 border-[#dadce0]">
+        <button id="tabNew" onclick="setTab('new')"
+          class="flex-1 py-3 rounded-xl font-black text-sm flex items-center justify-center gap-2 bg-white text-[#e53935] shadow-md transition-all">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+          새상품 분석
+        </button>
+        <button id="tabUsed" onclick="setTab('used')"
+          class="flex-1 py-3 rounded-xl font-black text-sm flex items-center justify-center gap-2 text-[#70757a] hover:bg-white/50 transition-all">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          중고 시세 분석
+        </button>
+      </div>
+
+      <!-- Score Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="bg-white/90 rounded-[2rem] p-8 border-2 border-[#dadce0] shadow-sm">
+          <div class="flex items-center gap-4 mb-6">
+            <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
+              <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+            </div>
+            <div>
+              <h4 class="text-lg font-black text-[#3c4043]">재테크 지수</h4>
+              <div class="text-xs font-bold text-[#70757a]">Investment Score</div>
+            </div>
+          </div>
+          <div class="flex items-end gap-3 mb-4">
+            <span id="investmentScore" class="text-5xl font-black text-emerald-600">-</span>
+            <span class="text-xl font-black text-[#70757a] mb-1">/ 100</span>
+          </div>
+          <p id="investmentReason" class="text-sm font-bold text-[#70757a] leading-relaxed"></p>
+        </div>
+        <div class="bg-white/90 rounded-[2rem] p-8 border-2 border-[#dadce0] shadow-sm">
+          <div class="flex items-center gap-4 mb-6">
+            <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center">
+              <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"/></svg>
+            </div>
+            <div>
+              <h4 class="text-lg font-black text-[#3c4043]">브릭당 가격 (PPP)</h4>
+              <div class="text-xs font-bold text-[#70757a]">Price Per Piece</div>
+            </div>
+          </div>
+          <div class="flex items-end gap-3 mb-4">
+            <span id="pppValue" class="text-5xl font-black text-amber-600">-</span>
+            <span class="text-sm font-black text-[#70757a] mb-1">/ 브릭</span>
+          </div>
+          <div id="pieceCount" class="text-xs font-bold text-[#70757a]"></div>
+        </div>
+      </div>
+
+      <!-- Used Prices (hidden by default) -->
+      <div id="usedSection" class="hidden bg-white/90 rounded-[2rem] p-8 border-2 border-[#dadce0] shadow-sm">
+        <div class="flex items-center gap-4 mb-6">
+          <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+          </div>
+          <div>
+            <h4 class="text-lg font-black text-[#3c4043]">중고 시세 상세</h4>
+            <div class="text-xs font-bold text-[#70757a]">Used Categories</div>
+          </div>
+        </div>
+        <div id="usedCategoryBtns" class="grid grid-cols-3 gap-2 mb-4"></div>
+        <div class="text-center">
+          <div id="usedSelectedPrice" class="text-2xl font-black text-blue-700"></div>
+        </div>
+      </div>
+
+      <!-- Retirement Risk -->
+      <div id="retirementCard" class="rounded-[2rem] p-8 border-2 border-[#dadce0] shadow-sm flex items-center gap-6 bg-white/80">
+        <div id="retirementIcon" class="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 text-white bg-emerald-500">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-3 mb-1">
+            <h4 class="text-lg font-black text-[#3c4043]">단종 위험도:</h4>
+            <span id="retirementBadge" class="px-3 py-1 rounded-full text-xs font-black bg-emerald-100 text-emerald-700"></span>
+          </div>
+          <p id="retirementReason" class="text-sm font-bold text-[#70757a]"></p>
+        </div>
+      </div>
+
+      <!-- Summary + Chart Card -->
+      <div class="bg-white/90 rounded-[2rem] border-2 border-[#dadce0] overflow-hidden shadow-sm">
+        <div id="statusHeader" class="px-8 py-6 flex items-center gap-4 border-b-2 border-[#dadce0] bg-emerald-50/50">
+          <div id="statusIcon" class="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shadow-sm font-black bg-emerald-400 text-white"></div>
+          <div>
+            <h2 id="statusText" class="text-2xl font-black text-[#3c4043] leading-tight"></h2>
+            <div id="statusSummary" class="text-sm font-bold text-[#70757a] mt-1"></div>
+          </div>
+        </div>
+
+        <!-- Price Stats -->
+        <div class="grid grid-cols-3 divide-x-2 divide-[#dadce0] border-b-2 border-[#dadce0] bg-[#f8f9fa]/50">
+          <div class="p-6 text-center">
+            <div class="text-[10px] font-black text-[#70757a] uppercase mb-2 tracking-wider">정가 (MSRP)</div>
+            <div id="originalPrice" class="text-xl font-black">-</div>
+          </div>
+          <div class="p-6 text-center">
+            <div class="text-[10px] font-black text-[#70757a] uppercase mb-2 tracking-wider">평균가</div>
+            <div id="averagePrice" class="text-xl font-black">-</div>
+          </div>
+          <div class="p-6 text-center cursor-pointer relative" onclick="toggleLowestTooltip()">
+            <div class="text-[10px] font-black text-[#70757a] uppercase mb-2 tracking-wider">역대 최저가</div>
+            <div id="lowestPrice" class="text-xl font-black text-[#e53935]">-</div>
+            <div id="lowestTooltip" class="hidden absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-56 p-4 bg-[#202124]/90 text-white text-xs rounded-2xl z-10 shadow-xl">
+              <div class="font-black mb-2 text-yellow-300 text-sm border-b border-white/10 pb-2">역대 최저가 기록</div>
+              <div class="space-y-1 font-bold">
+                <div class="flex justify-between"><span class="text-white/60">날짜</span><span id="lowestDate">-</span></div>
+                <div class="flex justify-between"><span class="text-white/60">판매처</span><span id="lowestMall" class="text-blue-300">-</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="p-8">
+          <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+            <h3 id="chartTitle" class="text-lg font-black text-[#3c4043]">가격 변동 히스토리</h3>
+            <div class="flex bg-[#f1f3f4]/50 p-1.5 rounded-xl border border-[#dadce0] gap-1">
+              <button onclick="setPeriod('all')" id="periodAll" class="px-3 py-1.5 text-[10px] font-black rounded-lg bg-white text-[#e53935] shadow-sm border border-[#dadce0]">전체</button>
+              <button onclick="setPeriod('1y')" id="period1y" class="px-3 py-1.5 text-[10px] font-black rounded-lg text-[#70757a]">1년</button>
+              <button onclick="setPeriod('6m')" id="period6m" class="px-3 py-1.5 text-[10px] font-black rounded-lg text-[#70757a]">6개월</button>
+            </div>
+          </div>
+          <div style="height: 280px;">
+            <canvas id="priceChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mall List -->
+      <div class="bg-white/90 rounded-[2rem] border-2 border-[#dadce0] overflow-hidden shadow-sm">
+        <div class="px-8 py-5 border-b-2 border-[#dadce0] bg-[#f8f9fa]/50 flex items-center justify-between">
+          <h3 class="text-lg font-black text-[#3c4043]">현재 판매처별 가격</h3>
+          <span id="mallOriginalPrice" class="text-[11px] font-black text-[#70757a] bg-white px-3 py-1 rounded-full border border-[#dadce0]"></span>
+        </div>
+        <div id="mallList" class="divide-y divide-[#f1f3f4]"></div>
+      </div>
+
+      <!-- Expert Advice -->
+      <div class="bg-[#E3F2FD]/50 rounded-[2rem] p-8 border-2 border-[#dadce0] shadow-sm">
+        <div class="flex gap-6">
+          <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm">
+            <svg class="w-8 h-8 text-[#42a5f5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div class="flex-1">
+            <h4 class="text-lg font-black text-[#42a5f5] mb-3">전문가 분석 리포트</h4>
+            <div id="evidenceText" class="text-base text-[#3c4043] leading-relaxed mb-6 font-bold"></div>
+            <div id="tipText" class="bg-white/80 p-5 rounded-2xl border border-[#42a5f5]/20 italic text-base text-[#42a5f5] font-black shadow-sm"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Global Prices -->
+      <div class="bg-white/90 rounded-[2rem] p-8 border-2 border-[#dadce0] shadow-sm">
+        <div class="flex items-center gap-4 mb-6">
+          <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div>
+            <h4 class="text-lg font-black text-[#3c4043]">해외 시세 (참고용)</h4>
+            <div class="text-xs font-bold text-[#70757a]">Global Market Reference</div>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="flex justify-between items-center p-4 bg-[#f8f9fa] rounded-2xl border border-[#dadce0]">
+            <span class="text-sm font-black text-[#3c4043]">Amazon US</span>
+            <span id="amazonPrice" class="text-xl font-black text-blue-600">-</span>
+          </div>
+          <div class="flex justify-between items-center p-4 bg-[#f8f9fa] rounded-2xl border border-[#dadce0]">
+            <span class="text-sm font-black text-[#3c4043]">BrickLink (신품)</span>
+            <span id="bricklinkPrice" class="text-xl font-black text-blue-600">-</span>
+          </div>
+        </div>
+        <p class="mt-4 text-[10px] font-bold text-[#70757a] text-center italic">* 해외 시세는 배송비와 관세가 포함되지 않은 순수 상품 가격입니다.</p>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-16 py-10 border-t-2 border-[#dadce0] text-center">
+      <p class="text-xs font-bold text-[#70757a] mb-6 max-w-lg mx-auto leading-relaxed">Gemini AI 기반 분석 결과입니다. 실제 가격은 쇼핑몰 상황에 따라 다를 수 있습니다.</p>
+      <div class="flex flex-wrap justify-center gap-3">
+        <div class="px-4 py-2 bg-white border border-[#dadce0] rounded-xl text-[11px] font-black text-[#3c4043] shadow-sm">MISB 기준</div>
+        <div class="px-4 py-2 bg-white border border-[#dadce0] rounded-xl text-[11px] font-black text-[#3c4043] shadow-sm">실시간 트렌드</div>
+        <div class="px-4 py-2 bg-white border border-[#dadce0] rounded-xl text-[11px] font-black text-[#3c4043] shadow-sm">단종 리스크 포함</div>
+      </div>
+    </footer>
+
+  </main>
+
+  <!-- 최근 검색 히스토리 패널 -->
+  <div id="historyPanel" class="hidden lg:flex fixed top-[84px] right-3 w-44 flex-col z-40">
+    <div class="bg-white/95 backdrop-blur border-2 border-[#dadce0] rounded-2xl shadow-lg overflow-hidden">
+      <div class="px-3 py-2 bg-[#e53935] text-white text-[11px] font-black uppercase tracking-wider flex items-center gap-1.5">
+        <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        최근 검색
+      </div>
+      <div id="historyList" class="overflow-y-auto max-h-[calc(100vh-150px)] divide-y divide-[#f1f3f4]"></div>
+    </div>
+  </div>
+
+  <!-- 우하단 API 키 변경 버튼 -->
+  <button onclick="resetApiKey()" title="API 키 변경"
+    class="fixed bottom-4 right-4 z-50 bg-black/20 hover:bg-black/40 text-white/60 hover:text-white p-2 rounded-lg text-[10px] transition-colors flex items-center gap-1">
+    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+    </svg>
+    키
+  </button>
+
+<script>
+const POPULAR_LEGO_SETS = [
+  { number: '10316', name: 'Rivendell (반지의 제왕: 리븐델)', image: 'https://images.brickset.com/sets/images/10316-1.jpg', year: '2023' },
+  { number: '10305', name: "Lion Knights' Castle (사자 기사의 성)", image: 'https://images.brickset.com/sets/images/10305-1.jpg', year: '2022' },
+  { number: '10302', name: 'Optimus Prime (옵티머스 프라임)', image: 'https://images.brickset.com/sets/images/10302-1.jpg', year: '2022' },
+  { number: '10294', name: 'Titanic (타이타닉)', image: 'https://images.brickset.com/sets/images/10294-1.jpg', year: '2021' },
+  { number: '10274', name: 'Ghostbusters ECTO-1 (고스트버스터즈 ECTO-1)', image: 'https://images.brickset.com/sets/images/10274-1.jpg', year: '2020' },
+  { number: '10276', name: 'Colosseum (콜로세움)', image: 'https://images.brickset.com/sets/images/10276-1.jpg', year: '2020' },
+  { number: '10281', name: 'Bonsai Tree (분재 나무)', image: 'https://images.brickset.com/sets/images/10281-1.jpg', year: '2021' },
+  { number: '10295', name: 'Porsche 911 (포르쉐 911)', image: 'https://images.brickset.com/sets/images/10295-1.jpg', year: '2021' },
+  { number: '10307', name: 'Eiffel Tower (에펠탑)', image: 'https://images.brickset.com/sets/images/10307-1.jpg', year: '2022' },
+  { number: '10326', name: 'Natural History Museum (자연사 박물관)', image: 'https://images.brickset.com/sets/images/10326-1.jpg', year: '2023' },
+  { number: '75192', name: 'Millennium Falcon (밀레니엄 팔콘 UCS)', image: 'https://images.brickset.com/sets/images/75192-1.jpg', year: '2017' },
+  { number: '75313', name: 'AT-AT (UCS)', image: 'https://images.brickset.com/sets/images/75313-1.jpg', year: '2021' },
+  { number: '75331', name: 'The Razor Crest (레이저 크레스트 UCS)', image: 'https://images.brickset.com/sets/images/75331-1.jpg', year: '2022' },
+  { number: '75341', name: "Luke Skywalker's Landspeeder (랜드스피더 UCS)", image: 'https://images.brickset.com/sets/images/75341-1.jpg', year: '2022' },
+  { number: '75252', name: 'Imperial Star Destroyer (스타 디스트로이어 UCS)', image: 'https://images.brickset.com/sets/images/75252-1.jpg', year: '2019' },
+  { number: '75308', name: 'R2-D2', image: 'https://images.brickset.com/sets/images/75308-1.jpg', year: '2021' },
+  { number: '75159', name: 'Death Star (데스 스타)', image: 'https://images.brickset.com/sets/images/75159-1.jpg', year: '2016' },
+  { number: '75367', name: 'Venator-Class Republic Attack Cruiser', image: 'https://images.brickset.com/sets/images/75367-1.jpg', year: '2023' },
+  { number: '42115', name: 'Lamborghini Sián FKP 37 (람보르기니 시안)', image: 'https://images.brickset.com/sets/images/42115-1.jpg', year: '2020' },
+  { number: '42143', name: 'Ferrari Daytona SP3 (페라리 데이토나)', image: 'https://images.brickset.com/sets/images/42143-1.jpg', year: '2022' },
+  { number: '42083', name: 'Bugatti Chiron (부가티 시론)', image: 'https://images.brickset.com/sets/images/42083-1.jpg', year: '2018' },
+  { number: '42110', name: 'Land Rover Defender (랜드로버 디펜더)', image: 'https://images.brickset.com/sets/images/42110-1.jpg', year: '2019' },
+  { number: '42141', name: 'McLaren Formula 1 Race Car (맥라렌 F1 레이스카)', image: 'https://images.brickset.com/sets/images/42141-1.jpg', year: '2022' },
+  { number: '21322', name: 'Pirates of Barracuda Bay (바라쿠다 해적들)', image: 'https://images.brickset.com/sets/images/21322-1.jpg', year: '2020' },
+  { number: '21323', name: 'Grand Piano (그랜드 피아노)', image: 'https://images.brickset.com/sets/images/21323-1.jpg', year: '2020' },
+  { number: '21325', name: 'Medieval Blacksmith (중세 대장간)', image: 'https://images.brickset.com/sets/images/21325-1.jpg', year: '2021' },
+  { number: '21327', name: 'Typewriter (타자기)', image: 'https://images.brickset.com/sets/images/21327-1.jpg', year: '2021' },
+  { number: '21333', name: 'The Starry Night (별이 빛나는 밤)', image: 'https://images.brickset.com/sets/images/21333-1.jpg', year: '2022' },
+  { number: '71043', name: 'Hogwarts Castle (호그와트 성)', image: 'https://images.brickset.com/sets/images/71043-1.jpg', year: '2018' },
+  { number: '75978', name: 'Diagon Alley (다이애건 앨리)', image: 'https://images.brickset.com/sets/images/75978-1.jpg', year: '2020' },
+  { number: '76405', name: "Hogwarts Express - Collectors' Edition", image: 'https://images.brickset.com/sets/images/76405-1.jpg', year: '2022' },
+  { number: '76417', name: 'Gringotts Wizarding Bank (그린고트 은행)', image: 'https://images.brickset.com/sets/images/76417-1.jpg', year: '2023' },
+  { number: '21058', name: 'Great Pyramid of Giza (기자의 대피라미드)', image: 'https://images.brickset.com/sets/images/21058-1.jpg', year: '2022' },
+  { number: '76178', name: 'Daily Bugle (데일리 뷰글)', image: 'https://images.brickset.com/sets/images/76178-1.jpg', year: '2021' },
+  { number: '76210', name: 'Hulkbuster (헐크버스터)', image: 'https://images.brickset.com/sets/images/76210-1.jpg', year: '2022' },
+  { number: '76269', name: 'Avengers Tower (어벤져스 타워)', image: 'https://images.brickset.com/sets/images/76269-1.jpg', year: '2023' },
+];
+
+const DEFAULT_API_KEY = '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';
+
+let currentResult = null;
+let currentTab = 'new';
+let currentPeriod = 'all';
+let currentUsedCat = 'misb';
+let priceChart = null;
+
+// 카테고리 매핑
+const CATEGORIES = {
+  icons:       s => ['10316','10305','10302','10294','10274','10276','10281','10295','10307','10326'].includes(s.number),
+  starwars:    s => ['75192','75313','75331','75341','75252','75308','75159','75367'].includes(s.number),
+  technic:     s => ['42115','42143','42083','42110','42141'].includes(s.number),
+  ideas:       s => ['21322','21323','21325','21327','21333'].includes(s.number),
+  harrypotter: s => ['71043','75978','76391','76405','76417'].includes(s.number),
+  marvel:      s => ['76178','76210','76269'].includes(s.number),
+};
+
+function filterCategory(cat) {
+  // 버튼 스타일 업데이트
+  const all = ['all','icons','starwars','technic','ideas','harrypotter','marvel'];
+  all.forEach(c => {
+    const btn = document.getElementById(`cat_${c}`);
+    if (!btn) return;
+    const active = (cat === null && c === 'all') || c === cat;
+    btn.className = `px-4 py-2 rounded-full text-xs font-black border-2 transition-all ${
+      active ? 'border-[#e53935] bg-[#e53935] text-white' : 'border-[#dadce0] bg-white text-[#3c4043] hover:border-[#e53935]'
+    }`;
+  });
+
+  const grid = document.getElementById('categoryGrid');
+  if (!cat) { grid.classList.add('hidden'); return; }
+
+  const sets = POPULAR_LEGO_SETS.filter(CATEGORIES[cat] || (() => false));
+  document.getElementById('categoryList').innerHTML = sets.map(s => `
+    <button onclick="selectFromCategory('${s.number}')"
+      class="bg-[#f8f9fa] rounded-2xl p-3 border-2 border-transparent hover:border-[#e53935] active:bg-red-50 transition-all text-left">
+      <div class="aspect-square bg-white rounded-xl mb-2 overflow-hidden">
+        <img src="${s.image}" alt="${s.name}" class="w-full h-full object-contain p-1"
+          onerror="this.src='https://via.placeholder.com/80'" referrerpolicy="no-referrer"/>
+      </div>
+      <div class="text-[10px] font-black text-[#e53935]">${s.number}</div>
+      <div class="text-[11px] font-bold text-[#3c4043] truncate">${s.name}</div>
+      ${s.year ? `<div class="text-[9px] text-[#70757a]">${s.year}</div>` : ''}
+    </button>
+  `).join('');
+  grid.classList.remove('hidden');
+}
+
+function selectFromCategory(number) {
+  document.getElementById('setNumberInput').value = number;
+  document.getElementById('categoryGrid').classList.add('hidden');
+  document.querySelector('#searchSection')?.scrollIntoView({ behavior: 'smooth' });
+}
+
+// API Key
+function resetApiKey() {
+  localStorage.removeItem('gemini_api_key');
+  document.getElementById('apiKeyInput').value = '';
+  document.getElementById('apiKeySection').classList.remove('hidden');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function loadApiKey() {
+  const saved = localStorage.getItem('gemini_api_key');
+  if (saved) {
+    document.getElementById('apiKeyInput').value = saved;
+  }
+}
+function saveApiKey() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  if (key) {
+    localStorage.setItem('gemini_api_key', key);
+    document.getElementById('apiKeySection').classList.add('hidden');
+  }
+}
+function getApiKey() {
+  return localStorage.getItem('gemini_api_key') || DEFAULT_API_KEY;
+}
+
+// Error
+function showError(msg) {
+  const box = document.getElementById('errorBox');
+  if (msg) { box.textContent = msg; box.classList.remove('hidden'); }
+  else { box.classList.add('hidden'); }
+}
+
+// Suggestions
+function handleSetInput() {
+  const val = document.getElementById('setNumberInput').value;
+  if (val.length < 2) { document.getElementById('suggestions').classList.add('hidden'); return; }
+  const matches = POPULAR_LEGO_SETS.filter(s =>
+    s.number.includes(val) || s.name.toLowerCase().includes(val.toLowerCase())
+  ).slice(0, 8);
+  if (!matches.length) { document.getElementById('suggestions').classList.add('hidden'); return; }
+  document.getElementById('suggestionsList').innerHTML = matches.map(s => `
+    <button onmousedown="selectSuggestion('${s.number}')"
+      class="w-full p-4 flex items-center gap-4 hover:bg-[#FFF9E5] transition-colors text-left">
+      <div class="w-14 h-14 bg-[#f1f3f4] rounded-lg overflow-hidden flex-shrink-0">
+        <img src="${s.image}" alt="${s.name}" class="w-full h-full object-contain"
+          onerror="this.src='https://via.placeholder.com/56'" referrerpolicy="no-referrer"/>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="text-sm font-black text-[#e53935]">${s.number}</div>
+        <div class="text-sm font-bold text-[#3c4043] truncate">${s.name}</div>
+        ${s.year ? `<div class="text-[10px] font-bold text-[#70757a]">${s.year} 출시</div>` : ''}
+      </div>
+    </button>
+  `).join('');
+  document.getElementById('suggestions').classList.remove('hidden');
+}
+function selectSuggestion(number) {
+  document.getElementById('setNumberInput').value = number;
+  document.getElementById('suggestions').classList.add('hidden');
+}
+function hideSuggestions() {
+  setTimeout(() => document.getElementById('suggestions').classList.add('hidden'), 200);
+}
+
+// Analyze
+async function analyzeLego() {
+  const setNumber = document.getElementById('setNumberInput').value.trim();
+  const currentPrice = document.getElementById('priceInput').value.trim();
+  if (!setNumber || !currentPrice) { showError('제품 번호와 현재 가격을 모두 입력해주세요.'); return; }
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    document.getElementById('apiKeySection').classList.remove('hidden');
+    showError('API Key를 먼저 입력해주세요. (Gemini 또는 Groq)');
+    return;
+  }
+
+  const btn = document.getElementById('analyzeBtn');
+  btn.disabled = true;
+  btn.innerHTML = `분석 중...`;
+  showError(null);
+  document.getElementById('results').classList.add('hidden');
+  document.getElementById('loadingOverlay').classList.remove('hidden');
+
+  const prompt = `당신은 레고 시장 분석 전문가입니다. 레고 제품 번호 ${setNumber}, 현재 판매가 ${currentPrice}원에 대해 심층 분석해주세요.
+
+반드시 아래 JSON 형식만 출력하세요 (다른 텍스트 없이):
+{
+  "status": "buy",
+  "statusText": "💚 지금 구매 추천",
+  "summary": "현재 가격은 평균 대비 저렴합니다",
+  "evidence": "상세 분석...",
+  "tip": "전문가 조언...",
+  "originalPrice": 123000,
+  "averagePrice": 110000,
+  "lowestPrice": 95000,
+  "lowestPriceDate": "2023-11-24",
+  "lowestPriceMall": "쇼핑몰명",
+  "pieceCount": 1500,
+  "ppp": 82,
+  "usedPrices": { "misb": 130000, "mib": 110000, "used": 85000 },
+  "retirementRisk": "low",
+  "retirementReason": "단종 위험 설명",
+  "investmentScore": 85,
+  "investmentReason": "투자 가치 설명",
+  "globalPrices": { "amazon": 99.99, "bricklink": 110.00, "currency": "USD" },
+  "malls": [
+    { "name": "쇼핑몰명", "price": 105000, "discountRate": 15, "url": "https://example.com", "isLowest": true }
+  ],
+  "historicalData": [
+    { "date": "2022-01", "price": 123000, "mall": "레고코리아", "discountRate": 0 },
+    { "date": "2022-06", "price": 110000, "mall": "SSG", "discountRate": 10 }
+  ],
+  "historicalDataUsed": [
+    { "date": "2022-01", "price": 115000, "mall": "번개장터", "discountRate": 0 },
+    { "date": "2022-06", "price": 120000, "mall": "중고나라", "discountRate": 0 }
+  ]
+}
+
+중요: 반드시 한국어로만 답변하세요. 한자, 러시아어, 일본어 등 다른 언어를 절대 사용하지 마세요. historicalData와 historicalDataUsed는 최소 10개 이상 포함.`;
+
+  try {
+    const isGroq = apiKey.startsWith('gsk_');
+    let text;
+
+    if (isGroq) {
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+        body: JSON.stringify({
+          model: 'llama-3.3-70b-versatile',
+          messages: [
+            { role: 'system', content: '당신은 한국어 전용 레고 시장 분석 전문가입니다. 반드시 순수한 한국어로만 답변하세요. 한자(保持, 推薦 등), 일본어, 러시아어, 영단어를 절대 사용하지 마세요. 숫자와 한글만 사용하세요.' },
+            { role: 'user', content: prompt }
+          ],
+          response_format: { type: 'json_object' }
+        })
+      });
+      if (!res.ok) { const err = await res.json(); throw new Error(err.error?.message || `HTTP ${res.status}`); }
+      const data = await res.json();
+      text = data.choices?.[0]?.message?.content;
+    } else {
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { responseMimeType: 'application/json' }
+          })
+        }
+      );
+      if (!res.ok) { const err = await res.json(); throw new Error(err.error?.message || `HTTP ${res.status}`); }
+      const data = await res.json();
+      text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    }
+
+    if (!text) throw new Error('빈 응답을 받았습니다.');
+    // 한자·일본어·러시아어 제거 (유니코드 범위)
+    const cleaned = text.replace(/[\u3400-\u9FFF\u0400-\u04FF\u3040-\u30FF]/g, '');
+    currentResult = JSON.parse(cleaned);
+    renderResults(currentResult, setNumber, currentPrice);
+    saveSearchHistory(setNumber, currentPrice);
+  } catch (e) {
+    showError(`오류: ${e.message}`);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> 분석 시작하기`;
+    document.getElementById('loadingOverlay').classList.add('hidden');
+  }
+}
+
+function renderResults(r, setNumber, currentPrice) {
+  // Product Info
+  const matched = POPULAR_LEGO_SETS.find(s => s.number === setNumber);
+  document.getElementById('productNumber').textContent = `No. ${setNumber}`;
+  document.getElementById('productName').textContent = matched?.name || `LEGO ${setNumber}`;
+  document.getElementById('productImage').src = matched?.image || `https://images.brickset.com/sets/images/${setNumber}-1.jpg`;
+  document.getElementById('productImage').alt = matched?.name || `LEGO ${setNumber}`;
+
+  // Scores
+  document.getElementById('investmentScore').textContent = r.investmentScore;
+  document.getElementById('investmentReason').textContent = r.investmentReason;
+  document.getElementById('pppValue').textContent = `₩${r.ppp}`;
+  document.getElementById('pieceCount').textContent = `총 부품 수: ${(r.pieceCount||0).toLocaleString()} pcs`;
+
+  // Retirement
+  const riskMap = {
+    high: { bg: 'bg-orange-500', card: 'bg-orange-50/80', badge: 'bg-orange-100 text-orange-700', text: '위험 (곧 단종)' },
+    medium: { bg: 'bg-amber-500', card: 'bg-white/80', badge: 'bg-amber-100 text-amber-700', text: '보통 (내년 예상)' },
+    low: { bg: 'bg-emerald-500', card: 'bg-white/80', badge: 'bg-emerald-100 text-emerald-700', text: '안전 (판매 중)' }
+  };
+  const risk = riskMap[r.retirementRisk] || riskMap.low;
+  document.getElementById('retirementCard').className = `rounded-[2rem] p-8 border-2 border-[#dadce0] shadow-sm flex items-center gap-6 ${risk.card}`;
+  document.getElementById('retirementIcon').className = `w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 text-white ${risk.bg}`;
+  document.getElementById('retirementBadge').className = `px-3 py-1 rounded-full text-xs font-black ${risk.badge}`;
+  document.getElementById('retirementBadge').textContent = risk.text;
+  document.getElementById('retirementReason').textContent = r.retirementReason;
+
+  // Status
+  const statusMap = {
+    buy: { bg: 'bg-emerald-50/50', icon: 'bg-emerald-400 text-white' },
+    wait: { bg: 'bg-amber-50/50', icon: 'bg-amber-400 text-white' },
+    expensive: { bg: 'bg-red-50/50', icon: 'bg-red-400 text-white' }
+  };
+  const sc = statusMap[r.status] || statusMap.wait;
+  document.getElementById('statusHeader').className = `px-8 py-6 flex items-center gap-4 border-b-2 border-[#dadce0] ${sc.bg}`;
+  document.getElementById('statusIcon').className = `w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shadow-sm font-black ${sc.icon}`;
+  const parts = (r.statusText || '').split(' ');
+  document.getElementById('statusIcon').textContent = parts[0] || '';
+  document.getElementById('statusText').textContent = parts.slice(1).join(' ');
+  document.getElementById('statusSummary').textContent = r.summary;
+
+  // 정가를 가격 입력창 기본값으로
+  const priceEl = document.getElementById('priceInput');
+  if (r.originalPrice && !priceEl.dataset.userEdited) {
+    priceEl.value = r.originalPrice;
+    priceEl.classList.add('price-autofill');
+  }
+
+  // Prices
+  document.getElementById('originalPrice').textContent = `₩${(r.originalPrice||0).toLocaleString()}`;
+  document.getElementById('averagePrice').textContent = `₩${(r.averagePrice||0).toLocaleString()}`;
+  document.getElementById('lowestPrice').textContent = `₩${(r.lowestPrice||0).toLocaleString()}`;
+  document.getElementById('lowestDate').textContent = r.lowestPriceDate || '-';
+  document.getElementById('lowestMall').textContent = r.lowestPriceMall || '-';
+  document.getElementById('mallOriginalPrice').textContent = `정가 ₩${(r.originalPrice||0).toLocaleString()} 대비`;
+
+  // Malls
+  document.getElementById('mallList').innerHTML = (r.malls || []).map(m => `
+    <a href="${m.url}" target="_blank" rel="noopener noreferrer"
+      style="-webkit-tap-highlight-color: rgba(229,57,53,0.08); display:block;"
+      class="px-6 py-5 flex items-center justify-between active:bg-[#FFF3F3] hover:bg-[#FFF9E5]/50 transition-all cursor-pointer">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 bg-white border border-[#dadce0] rounded-2xl flex items-center justify-center shadow-sm flex-shrink-0">
+          <svg class="w-6 h-6 text-[#5f6368]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-base font-black text-[#3c4043]">${m.name}</span>
+            <svg class="w-3 h-3 text-[#70757a]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-sm font-black text-[#d93025]">${m.discountRate}% 할인</span>
+            <span class="text-[11px] font-bold text-[#70757a] line-through">₩${(r.originalPrice||0).toLocaleString()}</span>
+          </div>
+        </div>
+      </div>
+      <div class="text-right flex-shrink-0">
+        <div class="text-xl font-black ${m.isLowest ? 'text-[#e53935]' : 'text-[#3c4043]'}">₩${(m.price||0).toLocaleString()}</div>
+        ${m.isLowest ? '<div class="text-[11px] font-black text-[#e53935] mt-1">✓ 최저가</div>' : `<div class="text-[11px] text-[#70757a] mt-1">평균 대비 ${m.price < r.averagePrice ? '저렴' : '높음'}</div>`}
+      </div>
+    </a>
+  `).join('');
+
+  // Expert
+  document.getElementById('evidenceText').innerHTML = (r.evidence || '').replace(/\n/g, '<br>');
+  document.getElementById('tipText').textContent = `" ${r.tip} "`;
+
+  // Global
+  document.getElementById('amazonPrice').textContent = r.globalPrices?.amazon ? `$${r.globalPrices.amazon}` : '정보 없음';
+  document.getElementById('bricklinkPrice').textContent = r.globalPrices?.bricklink ? `$${r.globalPrices.bricklink}` : '정보 없음';
+
+  // Used
+  renderUsedCategories(r);
+
+  // Show
+  const resultsEl = document.getElementById('results');
+  resultsEl.classList.remove('hidden');
+  resultsEl.classList.add('fade-in');
+
+  drawChart(r, currentPrice);
+  resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function renderUsedCategories(r) {
+  const cats = [{ key: 'misb', label: 'MISB' }, { key: 'mib', label: 'MIB' }, { key: 'used', label: 'Used' }];
+  document.getElementById('usedCategoryBtns').innerHTML = cats.map(c => `
+    <button onclick="selectUsedCat('${c.key}')" id="usedCat_${c.key}"
+      class="p-3 rounded-xl border-2 transition-all text-center ${currentUsedCat === c.key ? 'bg-blue-50 border-blue-400' : 'bg-white border-[#dadce0]'}">
+      <div class="text-[8px] font-black uppercase mb-1">${c.label}</div>
+      <div class="text-xs font-black">₩${(((r.usedPrices||{})[c.key]||0)/1000).toFixed(0)}k</div>
+    </button>
+  `).join('');
+  document.getElementById('usedSelectedPrice').textContent = `₩${((r.usedPrices||{})[currentUsedCat]||0).toLocaleString()}`;
+}
+function selectUsedCat(cat) {
+  currentUsedCat = cat;
+  if (currentResult) renderUsedCategories(currentResult);
+}
+
+// Tabs
+function setTab(tab) {
+  currentTab = tab;
+  const isNew = tab === 'new';
+  document.getElementById('tabNew').className = `flex-1 py-3 rounded-xl font-black text-sm flex items-center justify-center gap-2 transition-all ${isNew ? 'bg-white text-[#e53935] shadow-md' : 'text-[#70757a] hover:bg-white/50'}`;
+  document.getElementById('tabUsed').className = `flex-1 py-3 rounded-xl font-black text-sm flex items-center justify-center gap-2 transition-all ${!isNew ? 'bg-white text-[#42a5f5] shadow-md' : 'text-[#70757a] hover:bg-white/50'}`;
+  document.getElementById('usedSection').classList.toggle('hidden', isNew);
+  if (currentResult) drawChart(currentResult, document.getElementById('priceInput').value);
+}
+
+// Period
+function setPeriod(p) {
+  currentPeriod = p;
+  ['all', '1y', '6m'].forEach(id => {
+    const el = document.getElementById(`period${id === 'all' ? 'All' : id === '1y' ? '1y' : '6m'}`);
+    if (el) el.className = `px-3 py-1.5 text-[10px] font-black rounded-lg transition-all ${p === id ? 'bg-white text-[#e53935] shadow-sm border border-[#dadce0]' : 'text-[#70757a]'}`;
+  });
+  if (currentResult) drawChart(currentResult, document.getElementById('priceInput').value);
+}
+
+// Chart
+function drawChart(r, currentPrice) {
+  const raw = currentTab === 'new' ? (r.historicalData || []) : (r.historicalDataUsed || []);
+  let data = [...raw].sort((a, b) => new Date(a.date) - new Date(b.date));
+  if (currentPeriod !== 'all') {
+    const dates = data.map(d => new Date(d.date)).filter(d => !isNaN(d));
+    if (dates.length > 0) {
+      const latestDate = new Date(Math.max(...dates));
+      const cutoff = new Date(latestDate);
+      cutoff.setMonth(cutoff.getMonth() - (currentPeriod === '1y' ? 12 : 6));
+      data = data.filter(p => new Date(p.date) >= cutoff);
+    }
+  }
+  const color = currentTab === 'new' ? '#e53935' : '#42a5f5';
+  const ctx = document.getElementById('priceChart').getContext('2d');
+  if (priceChart) priceChart.destroy();
+
+  // Y축 범위: 데이터 min/max에 여백 (데이터 없으면 Chart.js 자동 스케일)
+  const allPrices = data.map(d => Number(d.price)).filter(v => Number.isFinite(v) && v > 0);
+  if (currentTab === 'new' && Number(currentPrice) > 0) allPrices.push(Number(currentPrice));
+  let yScaleOpts = {};
+  if (allPrices.length > 0) {
+    const minPrice = Math.min(...allPrices);
+    const maxPrice = Math.max(...allPrices);
+    const padding = Math.max((maxPrice - minPrice) * 0.3, minPrice * 0.05);
+    yScaleOpts = {
+      min: Math.floor((minPrice - padding) / 1000) * 1000,
+      max: Math.ceil((maxPrice + padding) / 1000) * 1000,
+    };
+  }
+
+  const datasets = [{
+    label: '가격',
+    data: data.map(d => d.price),
+    borderColor: color,
+    backgroundColor: color + '15',
+    borderWidth: 3,
+    pointRadius: 4,
+    pointBackgroundColor: color,
+    pointBorderColor: '#fff',
+    pointBorderWidth: 2,
+    tension: 0.3,
+    fill: true,
+  }];
+
+  if (currentTab === 'new' && currentPrice) {
+    datasets.push({
+      label: '현재가',
+      data: Array(data.length).fill(Number(currentPrice)),
+      borderColor: '#42a5f5',
+      borderWidth: 2,
+      borderDash: [5, 5],
+      pointRadius: 0,
+      fill: false,
+    });
+  }
+
+  priceChart = new Chart(ctx, {
+    type: 'line',
+    data: { labels: data.map(d => d.date), datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: 'index',
+        intersect: false,
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          enabled: true,
+          callbacks: {
+            afterLabel: (ctx) => {
+              const p = data[ctx.dataIndex];
+              const lines = [];
+              if (p?.mall) lines.push(`판매처: ${p.mall}`);
+              if (p?.discountRate) lines.push(`할인: ${p.discountRate}%`);
+              return lines;
+            },
+            label: (ctx) => `₩${(ctx.parsed.y||0).toLocaleString()}`
+          }
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' }, color: '#70757a', maxRotation: 45 } },
+        y: { ...yScaleOpts, grid: { color: '#f1f3f4' }, ticks: { font: { size: 10 }, color: '#70757a', callback: v => `₩${(v/1000).toFixed(0)}k` } }
+      }
+    }
+  });
+}
+
+// Lowest tooltip
+function toggleLowestTooltip() {
+  document.getElementById('lowestTooltip').classList.toggle('hidden');
+}
+
+// ── 최근 검색 히스토리 ──────────────────────────────────────
+const HISTORY_KEY = 'lego_search_history';
+const MAX_HISTORY = 20;
+
+function saveSearchHistory(setNumber, price) {
+  const matched = POPULAR_LEGO_SETS.find(s => s.number === setNumber);
+  const name = matched?.name || `LEGO ${setNumber}`;
+  const history = getSearchHistory();
+  const filtered = history.filter(h => h.setNumber !== setNumber);
+  filtered.unshift({ setNumber, price, name });
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(filtered.slice(0, MAX_HISTORY)));
+  renderHistoryPanel();
+}
+
+function getSearchHistory() {
+  try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch { return []; }
+}
+
+function applySearchHistory(setNumber, price) {
+  document.getElementById('setNumberInput').value = setNumber;
+  document.getElementById('priceInput').value = price;
+  document.getElementById('priceInput').classList.remove('price-autofill');
+  document.getElementById('priceInput').dataset.userEdited = '1';
+  analyzeLego();
+}
+
+function clearSearchHistory() {
+  localStorage.removeItem(HISTORY_KEY);
+  renderHistoryPanel();
+}
+
+function renderHistoryPanel() {
+  const list = document.getElementById('historyList');
+  if (!list) return;
+  const history = getSearchHistory();
+  if (history.length === 0) {
+    list.innerHTML = '<div class="px-3 py-5 text-[11px] text-[#aaa] text-center">검색 내역 없음</div>';
+    return;
+  }
+  list.innerHTML = history.map(h => `
+    <button onclick="applySearchHistory('${h.setNumber}','${h.price}')"
+      class="w-full text-left px-3 py-2.5 hover:bg-[#FFF9E5] active:bg-[#fde8e8] transition-colors block">
+      <div class="text-[11px] font-black text-[#e53935]">No. ${h.setNumber}</div>
+      <div class="text-[11px] text-[#202124] font-bold truncate leading-tight">${h.name}</div>
+      <div class="text-[10px] text-[#70757a] mt-0.5">₩${Number(h.price).toLocaleString()}</div>
+    </button>
+  `).join('') + `
+    <button onclick="clearSearchHistory()"
+      class="w-full text-center px-3 py-2 text-[10px] text-[#aaa] hover:text-[#e53935] transition-colors">
+      전체 삭제
+    </button>`;
+}
+
+// Init
+loadApiKey();
+renderHistoryPanel();
+['setNumberInput', 'priceInput', 'apiKeyInput'].forEach(id => {
+  document.getElementById(id).addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      if (id === 'apiKeyInput') saveApiKey();
+      else analyzeLego();
+    }
+  });
+});
+// 가격 직접 입력 시 autofill 스타일 제거
+const priceInputEl = document.getElementById('priceInput');
+priceInputEl.addEventListener('input', () => {
+  priceInputEl.classList.remove('price-autofill');
+  priceInputEl.dataset.userEdited = '1';
+});
+priceInputEl.addEventListener('focus', () => {
+  if (priceInputEl.classList.contains('price-autofill')) {
+    priceInputEl.select();
+  }
+});
+
+// ── 동영상 배경 제거 (Canvas 크로마키) ──────────────────────
+(function () {
+  const video = document.getElementById('skeletonVideo');
+  const canvas = document.getElementById('skeletonCanvas');
+  if (!video || !canvas) return;
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  let bgR = -1, bgG = -1, bgB = -1;
+  let rafId = null;
+
+  function detectBg() {
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const p = ctx.getImageData(0, 0, 1, 1).data;
+    bgR = p[0]; bgG = p[1]; bgB = p[2];
+  }
+
+  function removeBackground() {
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const d = img.data;
+    const tol = 40;
+    for (let i = 0; i < d.length; i += 4) {
+      if (Math.abs(d[i] - bgR) < tol &&
+          Math.abs(d[i+1] - bgG) < tol &&
+          Math.abs(d[i+2] - bgB) < tol) {
+        d[i+3] = 0;
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+    rafId = requestAnimationFrame(removeBackground);
+  }
+
+  video.addEventListener('play', () => {
+    setTimeout(() => {
+      detectBg();
+      if (rafId) cancelAnimationFrame(rafId);
+      removeBackground();
+    }, 80);
+  });
+
+  // 오버레이 열릴 때마다 재시작
+  const overlay = document.getElementById('loadingOverlay');
+  const obs = new MutationObserver(() => {
+    if (!overlay.classList.contains('hidden')) {
+      video.currentTime = 0;
+      video.play().catch(() => {});
+    } else {
+      if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+    }
+  });
+  obs.observe(overlay, { attributes: true, attributeFilter: ['class'] });
+})();
+</script>
+</body>
+</html>
