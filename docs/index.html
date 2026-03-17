@@ -12,19 +12,19 @@
     @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     .fade-in { animation: fadeIn 0.4s ease-out; }
 
-    /* 스켈레톤 걷기 */
-    @keyframes walk { 0%,100%{transform:translateX(-80px)} 50%{transform:translateX(calc(100vw + 80px))} }
-    @keyframes legL  { 0%,100%{transform:rotate(-30deg)} 50%{transform:rotate(30deg)} }
-    @keyframes legR  { 0%,100%{transform:rotate(30deg)}  50%{transform:rotate(-30deg)} }
-    @keyframes armL  { 0%,100%{transform:rotate(30deg)}  50%{transform:rotate(-30deg)} }
-    @keyframes armR  { 0%,100%{transform:rotate(-30deg)} 50%{transform:rotate(30deg)} }
-    @keyframes bob   { 0%,100%{transform:translateY(0)}  50%{transform:translateY(-4px)} }
-    .skeleton-walk { animation: walk 3s linear infinite; }
-    .skeleton-bob  { animation: bob 0.5s ease-in-out infinite; }
-    .leg-l  { transform-origin: top center; animation: legL 0.5s ease-in-out infinite; }
-    .leg-r  { transform-origin: top center; animation: legR 0.5s ease-in-out infinite; }
-    .arm-l  { transform-origin: top center; animation: armL 0.5s ease-in-out infinite; }
-    .arm-r  { transform-origin: top center; animation: armR 0.5s ease-in-out infinite; }
+    /* 스켈레톤 걷기 (옆모습) */
+    @keyframes walk  { 0%{transform:translateX(-80px)} 100%{transform:translateX(calc(100vw + 80px))} }
+    @keyframes legF  { 0%,100%{transform:rotate(-28deg)} 50%{transform:rotate(28deg)} }
+    @keyframes legB  { 0%,100%{transform:rotate(28deg)}  50%{transform:rotate(-28deg)} }
+    @keyframes armF  { 0%,100%{transform:rotate(22deg)}  50%{transform:rotate(-22deg)} }
+    @keyframes armB  { 0%,100%{transform:rotate(-22deg)} 50%{transform:rotate(22deg)} }
+    @keyframes bob   { 0%,100%{transform:translateY(0)}  50%{transform:translateY(-3px)} }
+    .skeleton-walk { animation: walk 7s linear infinite; }
+    .skeleton-bob  { animation: bob 0.8s ease-in-out infinite; }
+    .leg-f  { transform-origin: top center; animation: legF 0.8s ease-in-out infinite; }
+    .leg-b  { transform-origin: top center; animation: legB 0.8s ease-in-out infinite; }
+    .arm-f  { transform-origin: top center; animation: armF 0.8s ease-in-out infinite; }
+    .arm-b  { transform-origin: top center; animation: armB 0.8s ease-in-out infinite; }
   </style>
 </head>
 <body class="min-h-screen bg-[#FFF9E5] text-[#202124] font-sans">
@@ -146,45 +146,47 @@
       <div class="overflow-hidden w-full relative h-24">
         <div class="skeleton-walk absolute bottom-0">
           <div class="skeleton-bob">
-            <svg width="60" height="90" viewBox="0 0 60 90" fill="none">
-              <!-- 머리 -->
-              <ellipse cx="30" cy="10" rx="9" ry="10" fill="white" stroke="#ccc" stroke-width="1.5"/>
-              <!-- 눈 -->
-              <ellipse cx="26" cy="9" rx="2" ry="2.5" fill="#222"/>
-              <ellipse cx="34" cy="9" rx="2" ry="2.5" fill="#222"/>
-              <!-- 코뼈 -->
-              <path d="M29 13 L31 13 L30 16 Z" fill="#aaa"/>
-              <!-- 이빨 -->
-              <rect x="24" y="16" width="4" height="3" rx="0.5" fill="white" stroke="#bbb" stroke-width="0.5"/>
-              <rect x="29" y="16" width="4" height="3" rx="0.5" fill="white" stroke="#bbb" stroke-width="0.5"/>
-              <!-- 몸통 -->
-              <rect x="22" y="22" width="16" height="22" rx="3" fill="white" stroke="#ccc" stroke-width="1.5"/>
-              <!-- 갈비뼈 -->
-              <path d="M25 27 Q22 29 25 31" stroke="#ccc" stroke-width="1" fill="none"/>
-              <path d="M35 27 Q38 29 35 31" stroke="#ccc" stroke-width="1" fill="none"/>
-              <path d="M25 32 Q22 34 25 36" stroke="#ccc" stroke-width="1" fill="none"/>
-              <path d="M35 32 Q38 34 35 36" stroke="#ccc" stroke-width="1" fill="none"/>
-              <!-- 팔 왼쪽 -->
-              <g class="arm-l" style="transform-box:fill-box;">
-                <rect x="10" y="22" width="10" height="5" rx="2.5" fill="white" stroke="#ccc" stroke-width="1.5"/>
-                <rect x="8" y="27" width="8" height="14" rx="2" fill="white" stroke="#ccc" stroke-width="1.5"/>
+            <svg width="55" height="90" viewBox="0 0 55 90" fill="none">
+              <!-- 두개골 (옆모습, 오른쪽 방향) -->
+              <ellipse cx="32" cy="11" rx="11" ry="12" fill="white" stroke="#ccc" stroke-width="1.5"/>
+              <!-- 눈구멍 (하나) -->
+              <ellipse cx="38" cy="9" rx="3" ry="3.5" fill="#333"/>
+              <!-- 코뼈 (옆면) -->
+              <path d="M41 13 L45 15 L43 18" stroke="#bbb" fill="none" stroke-width="1.5" stroke-linecap="round"/>
+              <!-- 이빨 (옆면) -->
+              <rect x="37" y="19" width="3.5" height="3.5" rx="0.5" fill="white" stroke="#bbb" stroke-width="0.5"/>
+              <rect x="40.5" y="19" width="3.5" height="3.5" rx="0.5" fill="white" stroke="#bbb" stroke-width="0.5"/>
+              <!-- 목 -->
+              <rect x="28" y="23" width="7" height="5" rx="1" fill="white" stroke="#ccc" stroke-width="1"/>
+              <!-- 뒷팔 (흐리게) -->
+              <g class="arm-b" style="transform-box:fill-box;">
+                <rect x="23" y="28" width="5" height="13" rx="2" fill="#e8e8e8" stroke="#ccc" stroke-width="1"/>
+                <rect x="22" y="40" width="5" height="10" rx="2" fill="#e8e8e8" stroke="#ccc" stroke-width="1"/>
               </g>
-              <!-- 팔 오른쪽 -->
-              <g class="arm-r" style="transform-box:fill-box;">
-                <rect x="40" y="22" width="10" height="5" rx="2.5" fill="white" stroke="#ccc" stroke-width="1.5"/>
-                <rect x="44" y="27" width="8" height="14" rx="2" fill="white" stroke="#ccc" stroke-width="1.5"/>
+              <!-- 몸통 (옆면) -->
+              <rect x="22" y="28" width="13" height="21" rx="2" fill="white" stroke="#ccc" stroke-width="1.5"/>
+              <!-- 척추 -->
+              <line x1="26" y1="29" x2="26" y2="48" stroke="#ddd" stroke-width="1"/>
+              <!-- 갈비뼈 (옆면) -->
+              <path d="M26 33 L34 32" stroke="#ccc" stroke-width="1"/>
+              <path d="M26 37 L34 36" stroke="#ccc" stroke-width="1"/>
+              <path d="M26 41 L34 40" stroke="#ccc" stroke-width="1"/>
+              <!-- 앞팔 -->
+              <g class="arm-f" style="transform-box:fill-box;">
+                <rect x="28" y="28" width="5" height="13" rx="2" fill="white" stroke="#ccc" stroke-width="1.5"/>
+                <rect x="29" y="40" width="5" height="10" rx="2" fill="white" stroke="#ccc" stroke-width="1.5"/>
               </g>
               <!-- 골반 -->
-              <rect x="23" y="44" width="14" height="6" rx="3" fill="white" stroke="#ccc" stroke-width="1.5"/>
-              <!-- 다리 왼쪽 -->
-              <g class="leg-l" style="transform-box:fill-box;">
-                <rect x="23" y="50" width="8" height="20" rx="3" fill="white" stroke="#ccc" stroke-width="1.5"/>
-                <rect x="22" y="68" width="10" height="6" rx="2" fill="white" stroke="#ccc" stroke-width="1.5"/>
+              <rect x="21" y="49" width="15" height="7" rx="2" fill="white" stroke="#ccc" stroke-width="1.5"/>
+              <!-- 뒷다리 (흐리게) -->
+              <g class="leg-b" style="transform-box:fill-box;">
+                <rect x="21" y="56" width="9" height="20" rx="2" fill="#e8e8e8" stroke="#ccc" stroke-width="1"/>
+                <rect x="19" y="74" width="13" height="6" rx="2" fill="#e8e8e8" stroke="#ccc" stroke-width="1"/>
               </g>
-              <!-- 다리 오른쪽 -->
-              <g class="leg-r" style="transform-box:fill-box;">
-                <rect x="29" y="50" width="8" height="20" rx="3" fill="white" stroke="#ccc" stroke-width="1.5"/>
-                <rect x="28" y="68" width="10" height="6" rx="2" fill="white" stroke="#ccc" stroke-width="1.5"/>
+              <!-- 앞다리 -->
+              <g class="leg-f" style="transform-box:fill-box;">
+                <rect x="24" y="56" width="9" height="20" rx="2" fill="white" stroke="#ccc" stroke-width="1.5"/>
+                <rect x="22" y="74" width="14" height="6" rx="2" fill="white" stroke="#ccc" stroke-width="1.5"/>
               </g>
             </svg>
           </div>
