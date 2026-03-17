@@ -463,17 +463,26 @@ function sanitizeResult(r, releaseYear) {
         url: (m.url && m.url !== 'undefined' && m.url.startsWith('http')) ? m.url : null,
         isLowest: !!m.isLowest,
       })),
-    historicalData: sanitizeHistory(r.historicalData, releaseYear || String(r.releaseYear || '')),
-    historicalDataUsed: sanitizeHistory(r.historicalDataUsed, releaseYear || String(r.releaseYear || '')),
+    historicalData: sanitizeHistory(r.historicalData, releaseYear, r.releaseYear),
+    historicalDataUsed: sanitizeHistory(r.historicalDataUsed, releaseYear, r.releaseYear),
   };
 }
 
-function sanitizeHistory(arr, releaseYear) {
+function sanitizeHistory(arr, knownYear, aiYear) {
   if (!Array.isArray(arr)) return [];
+
+  // 출시년도 결정: 로컬 데이터 > AI 반환값 > 현재연도-2 (fallback)
+  const currentYear = new Date().getFullYear();
+  const rawYear = knownYear || (aiYear && String(aiYear)) || null;
+  const yearNum = rawYear ? parseInt(rawYear) : null;
+  // 연도가 유효하지 않거나 너무 오래됐으면 (2000 미만 or 미래) fallback
+  const cutoffYear = (yearNum && yearNum >= 2000 && yearNum <= currentYear)
+    ? yearNum
+    : currentYear - 2; // 연도 모르면 최근 2년치만
+
   return arr
     .map(d => {
       const raw = String(d?.date || '').trim();
-      // YYYY-MM, YYYY-M, YYYY.MM, YYYY/MM, YYYY년 M월 등 허용
       const m = raw.match(/(\d{4})[-./년\s](\d{1,2})/);
       const date = m ? `${m[1]}-${m[2].padStart(2, '0')}` : null;
       return {
@@ -485,8 +494,7 @@ function sanitizeHistory(arr, releaseYear) {
     })
     .filter(d => {
       if (!d.date || !Number.isFinite(d.price) || d.price <= 0) return false;
-      // 출시년도 이전 데이터 제거
-      if (releaseYear && parseInt(d.date.slice(0, 4)) < parseInt(releaseYear)) return false;
+      if (parseInt(d.date.slice(0, 4)) < cutoffYear) return false;
       return true;
     });
 }
@@ -623,7 +631,8 @@ async function analyzeLego() {
   const matchedSet = POPULAR_LEGO_SETS.find(s => s.number === setNumber);
   const releaseYear = matchedSet?.year || null;
 
-  const prompt = `당신은 레고 시장 분석 전문가입니다. 레고 제품 번호 ${setNumber}${releaseYear ? ` (${releaseYear}년 출시)` : ''}, 현재 판매가 ${currentPrice}원에 대해 심층 분석해주세요.
+  const today = new Date().toISOString().slice(0, 7); // YYYY-MM
+  const prompt = `당신은 레고 시장 분석 전문가입니다. 오늘은 ${today}입니다. 레고 제품 번호 ${setNumber}${releaseYear ? ` (${releaseYear}년 출시)` : ''}, 현재 판매가 ${currentPrice}원에 대해 심층 분석해주세요.
 
 반드시 아래 JSON 형식만 출력하세요 (다른 텍스트 없이):
 {
