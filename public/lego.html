@@ -132,10 +132,9 @@
     </section>
 
     <!-- Loading Overlay -->
-    <div id="loadingOverlay" class="hidden fixed inset-0 z-40 bg-[#FFF9E5]/90 flex flex-col items-center justify-center gap-6">
+    <div id="loadingOverlay" class="hidden fixed inset-0 z-40 flex flex-col items-center justify-center gap-6 pointer-events-none">
       <div class="flex justify-center">
-        <canvas id="skeletonCanvas" width="320" height="320" style="width:200px;height:200px;"></canvas>
-        <video id="skeletonVideo" autoplay loop muted playsinline style="display:none;">
+        <video id="skeletonVideo" autoplay loop muted playsinline style="width:200px;height:200px;mix-blend-mode:multiply;">
           <source src="skeleton.mp4" type="video/mp4">
         </video>
       </div>
@@ -779,16 +778,30 @@ function setPeriod(p) {
 }
 
 // Chart
+function parseChartDate(dateStr) {
+  const s = String(dateStr || '').trim();
+  // YYYY-MM or YYYY-M → YYYY-MM-01
+  if (/^\d{4}-\d{1,2}$/.test(s)) {
+    const [y, m] = s.split('-');
+    return new Date(`${y}-${m.padStart(2, '0')}-01`);
+  }
+  return new Date(s);
+}
+
 function drawChart(r, currentPrice) {
   const raw = currentTab === 'new' ? (r.historicalData || []) : (r.historicalDataUsed || []);
-  let data = [...raw].sort((a, b) => new Date(a.date) - new Date(b.date));
+  let data = [...raw].sort((a, b) => parseChartDate(a.date) - parseChartDate(b.date));
   if (currentPeriod !== 'all') {
-    const dates = data.map(d => new Date(d.date)).filter(d => !isNaN(d));
+    const dates = data.map(d => parseChartDate(d.date)).filter(d => !isNaN(d));
     if (dates.length > 0) {
       const latestDate = new Date(Math.max(...dates));
       const cutoff = new Date(latestDate);
       cutoff.setMonth(cutoff.getMonth() - (currentPeriod === '1y' ? 12 : 6));
-      data = data.filter(p => new Date(p.date) >= cutoff);
+      const filtered = data.filter(p => {
+        const d = parseChartDate(p.date);
+        return !isNaN(d) && d >= cutoff;
+      });
+      if (filtered.length > 0) data = filtered;
     }
   }
   const color = currentTab === 'new' ? '#e53935' : '#42a5f5';
@@ -950,53 +963,15 @@ priceInputEl.addEventListener('focus', () => {
   }
 });
 
-// ── 동영상 배경 제거 (Canvas 크로마키) ──────────────────────
+// ── 로딩 오버레이 열릴 때 비디오 재시작 ──────────────────────
 (function () {
   const video = document.getElementById('skeletonVideo');
-  const canvas = document.getElementById('skeletonCanvas');
-  if (!video || !canvas) return;
-  const ctx = canvas.getContext('2d', { willReadFrequently: true });
-  let bgR = -1, bgG = -1, bgB = -1;
-  let rafId = null;
-
-  function detectBg() {
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    const p = ctx.getImageData(0, 0, 1, 1).data;
-    bgR = p[0]; bgG = p[1]; bgB = p[2];
-  }
-
-  function removeBackground() {
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const d = img.data;
-    const tol = 40;
-    for (let i = 0; i < d.length; i += 4) {
-      if (Math.abs(d[i] - bgR) < tol &&
-          Math.abs(d[i+1] - bgG) < tol &&
-          Math.abs(d[i+2] - bgB) < tol) {
-        d[i+3] = 0;
-      }
-    }
-    ctx.putImageData(img, 0, 0);
-    rafId = requestAnimationFrame(removeBackground);
-  }
-
-  video.addEventListener('play', () => {
-    setTimeout(() => {
-      detectBg();
-      if (rafId) cancelAnimationFrame(rafId);
-      removeBackground();
-    }, 80);
-  });
-
-  // 오버레이 열릴 때마다 재시작
   const overlay = document.getElementById('loadingOverlay');
+  if (!video || !overlay) return;
   const obs = new MutationObserver(() => {
     if (!overlay.classList.contains('hidden')) {
       video.currentTime = 0;
       video.play().catch(() => {});
-    } else {
-      if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
     }
   });
   obs.observe(overlay, { attributes: true, attributeFilter: ['class'] });
