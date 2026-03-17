@@ -13,16 +13,16 @@
     .fade-in { animation: fadeIn 0.4s ease-out; }
 
     /* 스켈레톤 제자리 걷기 */
-    @keyframes legF  { 0%,100%{transform:rotate(-28deg)} 50%{transform:rotate(28deg)} }
-    @keyframes legB  { 0%,100%{transform:rotate(28deg)}  50%{transform:rotate(-28deg)} }
-    @keyframes armF  { 0%,100%{transform:rotate(22deg)}  50%{transform:rotate(-22deg)} }
-    @keyframes armB  { 0%,100%{transform:rotate(-22deg)} 50%{transform:rotate(22deg)} }
-    @keyframes bob   { 0%,100%{transform:translateY(0)}  50%{transform:translateY(-4px)} }
-    .skeleton-bob  { animation: bob 0.8s ease-in-out infinite; }
-    .leg-f  { transform-origin: top center; animation: legF 0.8s ease-in-out infinite; }
-    .leg-b  { transform-origin: top center; animation: legB 0.8s ease-in-out infinite; }
-    .arm-f  { transform-origin: top center; animation: armF 0.8s ease-in-out infinite; }
-    .arm-b  { transform-origin: top center; animation: armB 0.8s ease-in-out infinite; }
+    @keyframes skeletonWalk {
+      0%   { transform: translateY(0px) rotate(-1.5deg); }
+      25%  { transform: translateY(-6px) rotate(0deg); }
+      50%  { transform: translateY(0px) rotate(1.5deg); }
+      75%  { transform: translateY(-6px) rotate(0deg); }
+      100% { transform: translateY(0px) rotate(-1.5deg); }
+    }
+    .skeleton-img { animation: skeletonWalk 0.7s ease-in-out infinite; width: 110px; }
+    /* 정가 자동입력 스타일 */
+    .price-autofill { color: #aaa !important; }
   </style>
 </head>
 <body class="min-h-screen bg-[#FFF9E5] text-[#202124] font-sans">
@@ -142,58 +142,8 @@
     <!-- Loading Overlay -->
     <div id="loadingOverlay" class="hidden fixed inset-0 z-40 bg-[#FFF9E5]/90 flex flex-col items-center justify-center gap-6">
       <div class="flex justify-center">
-        <div class="skeleton-bob">
-            <svg width="70" height="112" viewBox="0 0 70 112" fill="none">
-              <!-- 머리 스터드 -->
-              <ellipse cx="34" cy="4" rx="6.5" ry="3.5" fill="#ECEADF" stroke="#bbb" stroke-width="1"/>
-              <rect x="27.5" y="4" width="13" height="3" fill="#ECEADF"/>
-              <!-- 머리 (둥근 미니피그) -->
-              <circle cx="34" cy="18" r="14" fill="#F2EEE3" stroke="#ccc" stroke-width="1.5"/>
-              <!-- 눈구멍 (크고 검정) -->
-              <ellipse cx="41" cy="15" rx="6" ry="6.5" fill="#1C1C1C"/>
-              <!-- 이빨 -->
-              <rect x="38" y="27" width="3" height="3.5" rx="0.5" fill="#F2EEE3" stroke="#aaa" stroke-width="0.5"/>
-              <rect x="41" y="27" width="3" height="3.5" rx="0.5" fill="#F2EEE3" stroke="#aaa" stroke-width="0.5"/>
-              <rect x="44" y="27" width="3" height="3.5" rx="0.5" fill="#F2EEE3" stroke="#aaa" stroke-width="0.5"/>
-              <!-- 목 -->
-              <rect x="28" y="32" width="12" height="5" rx="2" fill="#ECEADF" stroke="#ccc" stroke-width="1"/>
-              <!-- 뒷팔 (흐린 색) -->
-              <g class="arm-b" style="transform-box:fill-box;">
-                <ellipse cx="24" cy="44" rx="4.5" ry="9" fill="#DEDAD0" stroke="#bbb" stroke-width="1"/>
-                <ellipse cx="22" cy="58" rx="3.5" ry="7" fill="#DEDAD0" stroke="#bbb" stroke-width="1"/>
-              </g>
-              <!-- 흉곽 등쪽 (척추) -->
-              <rect x="22" y="37" width="8" height="24" rx="3" fill="#F2EEE3" stroke="#ccc" stroke-width="1.5"/>
-              <!-- 갈비뼈 아치 1 -->
-              <path d="M28 41 Q44 40 45 45 Q45 50 28 51" stroke="#ccc" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <!-- 갈비뼈 아치 2 -->
-              <path d="M28 52 Q43 51 44 56 Q44 60 28 60" stroke="#ccc" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <!-- 앞팔 -->
-              <g class="arm-f" style="transform-box:fill-box;">
-                <ellipse cx="33" cy="44" rx="4.5" ry="9" fill="#F2EEE3" stroke="#ccc" stroke-width="1.5"/>
-                <ellipse cx="35" cy="58" rx="3.5" ry="7" fill="#F2EEE3" stroke="#ccc" stroke-width="1.5"/>
-              </g>
-              <!-- 골반 -->
-              <path d="M20 62 Q29 66 40 62 L39 69 Q29 72 21 69 Z" fill="#F2EEE3" stroke="#ccc" stroke-width="1.5"/>
-              <!-- 뒷다리 (흐린 색) -->
-              <g class="leg-b" style="transform-box:fill-box;">
-                <ellipse cx="26" cy="80" rx="5" ry="10" fill="#DEDAD0" stroke="#bbb" stroke-width="1"/>
-                <ellipse cx="25" cy="95" rx="4" ry="7" fill="#DEDAD0" stroke="#bbb" stroke-width="1"/>
-                <line x1="18" y1="101" x2="22" y2="106" stroke="#bbb" stroke-width="2" stroke-linecap="round"/>
-                <line x1="25" y1="101" x2="25" y2="107" stroke="#bbb" stroke-width="2" stroke-linecap="round"/>
-                <line x1="32" y1="101" x2="28" y2="106" stroke="#bbb" stroke-width="2" stroke-linecap="round"/>
-              </g>
-              <!-- 앞다리 -->
-              <g class="leg-f" style="transform-box:fill-box;">
-                <ellipse cx="31" cy="80" rx="5" ry="10" fill="#F2EEE3" stroke="#ccc" stroke-width="1.5"/>
-                <ellipse cx="30" cy="95" rx="4" ry="7" fill="#F2EEE3" stroke="#ccc" stroke-width="1.5"/>
-                <line x1="22" y1="101" x2="26" y2="106" stroke="#ccc" stroke-width="2" stroke-linecap="round"/>
-                <line x1="30" y1="101" x2="30" y2="107" stroke="#ccc" stroke-width="2" stroke-linecap="round"/>
-                <line x1="38" y1="101" x2="34" y2="106" stroke="#ccc" stroke-width="2" stroke-linecap="round"/>
-              </g>
-            </svg>
-          </div>
-        </div>
+        <img src="legoskeleton.jpg" class="skeleton-img" alt="loading"/>
+      </div>
       <p class="text-sm font-black text-[#70757a]">분석 중이에요...</p>
     </div>
 
@@ -721,6 +671,13 @@ function renderResults(r, setNumber, currentPrice) {
   document.getElementById('statusText').textContent = parts.slice(1).join(' ');
   document.getElementById('statusSummary').textContent = r.summary;
 
+  // 정가를 가격 입력창 기본값으로
+  const priceEl = document.getElementById('priceInput');
+  if (r.originalPrice && !priceEl.dataset.userEdited) {
+    priceEl.value = r.originalPrice;
+    priceEl.classList.add('price-autofill');
+  }
+
   // Prices
   document.getElementById('originalPrice').textContent = `₩${(r.originalPrice||0).toLocaleString()}`;
   document.getElementById('averagePrice').textContent = `₩${(r.averagePrice||0).toLocaleString()}`;
@@ -908,6 +865,16 @@ loadApiKey();
       else analyzeLego();
     }
   });
+});
+const priceInputEl = document.getElementById('priceInput');
+priceInputEl.addEventListener('input', () => {
+  priceInputEl.classList.remove('price-autofill');
+  priceInputEl.dataset.userEdited = '1';
+});
+priceInputEl.addEventListener('focus', () => {
+  if (priceInputEl.classList.contains('price-autofill')) {
+    priceInputEl.select();
+  }
 });
 </script>
 </body>
