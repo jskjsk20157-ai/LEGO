@@ -12,14 +12,12 @@
     @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     .fade-in { animation: fadeIn 0.4s ease-out; }
 
-    /* 스켈레톤 걷기 (옆모습) */
-    @keyframes walk  { 0%{transform:translateX(-80px)} 100%{transform:translateX(calc(100vw + 80px))} }
+    /* 스켈레톤 제자리 걷기 */
     @keyframes legF  { 0%,100%{transform:rotate(-28deg)} 50%{transform:rotate(28deg)} }
     @keyframes legB  { 0%,100%{transform:rotate(28deg)}  50%{transform:rotate(-28deg)} }
     @keyframes armF  { 0%,100%{transform:rotate(22deg)}  50%{transform:rotate(-22deg)} }
     @keyframes armB  { 0%,100%{transform:rotate(-22deg)} 50%{transform:rotate(22deg)} }
-    @keyframes bob   { 0%,100%{transform:translateY(0)}  50%{transform:translateY(-3px)} }
-    .skeleton-walk { animation: walk 7s linear infinite; }
+    @keyframes bob   { 0%,100%{transform:translateY(0)}  50%{transform:translateY(-4px)} }
     .skeleton-bob  { animation: bob 0.8s ease-in-out infinite; }
     .leg-f  { transform-origin: top center; animation: legF 0.8s ease-in-out infinite; }
     .leg-b  { transform-origin: top center; animation: legB 0.8s ease-in-out infinite; }
@@ -143,9 +141,8 @@
 
     <!-- Loading Overlay -->
     <div id="loadingOverlay" class="hidden fixed inset-0 z-40 bg-[#FFF9E5]/90 flex flex-col items-center justify-center gap-6">
-      <div class="overflow-hidden w-full relative h-32">
-        <div class="skeleton-walk absolute bottom-0">
-          <div class="skeleton-bob">
+      <div class="flex justify-center">
+        <div class="skeleton-bob">
             <svg width="70" height="112" viewBox="0 0 70 112" fill="none">
               <!-- 머리 스터드 -->
               <ellipse cx="34" cy="4" rx="6.5" ry="3.5" fill="#ECEADF" stroke="#bbb" stroke-width="1"/>
@@ -197,7 +194,6 @@
             </svg>
           </div>
         </div>
-      </div>
       <p class="text-sm font-black text-[#70757a]">분석 중이에요...</p>
     </div>
 
