@@ -851,14 +851,19 @@ function drawChart(r, currentPrice) {
   const ctx = document.getElementById('priceChart').getContext('2d');
   if (priceChart) priceChart.destroy();
 
-  // Y축 범위: 데이터 min/max에 15% 여백
-  const allPrices = data.map(d => d.price).filter(Boolean);
-  if (currentTab === 'new' && currentPrice) allPrices.push(Number(currentPrice));
-  const minPrice = Math.min(...allPrices);
-  const maxPrice = Math.max(...allPrices);
-  const padding = Math.max((maxPrice - minPrice) * 0.3, minPrice * 0.05);
-  const yMin = Math.floor((minPrice - padding) / 1000) * 1000;
-  const yMax = Math.ceil((maxPrice + padding) / 1000) * 1000;
+  // Y축 범위: 데이터 min/max에 여백 (데이터 없으면 Chart.js 자동 스케일)
+  const allPrices = data.map(d => Number(d.price)).filter(v => Number.isFinite(v) && v > 0);
+  if (currentTab === 'new' && Number(currentPrice) > 0) allPrices.push(Number(currentPrice));
+  let yScaleOpts = {};
+  if (allPrices.length > 0) {
+    const minPrice = Math.min(...allPrices);
+    const maxPrice = Math.max(...allPrices);
+    const padding = Math.max((maxPrice - minPrice) * 0.3, minPrice * 0.05);
+    yScaleOpts = {
+      min: Math.floor((minPrice - padding) / 1000) * 1000,
+      max: Math.ceil((maxPrice + padding) / 1000) * 1000,
+    };
+  }
 
   const datasets = [{
     label: '가격',
@@ -914,7 +919,7 @@ function drawChart(r, currentPrice) {
       },
       scales: {
         x: { grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' }, color: '#70757a', maxRotation: 45 } },
-        y: { min: yMin, max: yMax, grid: { color: '#f1f3f4' }, ticks: { font: { size: 10 }, color: '#70757a', callback: v => `₩${(v/1000).toFixed(0)}k` } }
+        y: { ...yScaleOpts, grid: { color: '#f1f3f4' }, ticks: { font: { size: 10 }, color: '#70757a', callback: v => `₩${(v/1000).toFixed(0)}k` } }
       }
     }
   });
