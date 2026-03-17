@@ -29,25 +29,18 @@
           <div class="text-[10px] font-bold text-white/70 uppercase tracking-[0.2em]">SMART BRICK ADVISOR</div>
         </div>
       </div>
-      <button onclick="resetApiKey()" title="API 키 변경"
-        class="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-3 py-2 rounded-xl text-xs font-black transition-colors">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
-        </svg>
-        API 키 변경
-      </button>
     </div>
   </header>
 
   <main class="max-w-4xl mx-auto px-4 py-10">
 
-    <!-- API Key Section -->
-    <div id="apiKeySection" class="mb-6">
+    <!-- API Key Section (hidden by default) -->
+    <div id="apiKeySection" class="hidden mb-6">
       <div class="bg-amber-50 border-2 border-amber-200 rounded-2xl p-4 flex items-center gap-3">
         <svg class="w-5 h-5 text-amber-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
         </svg>
-        <input type="password" id="apiKeyInput" placeholder="API Key 입력 (Gemini: AIza... / Groq: gsk_...)"
+        <input type="password" id="apiKeyInput" placeholder="API Key 입력 (Groq: gsk_... / Gemini: AIza...)"
           class="flex-1 bg-transparent outline-none text-sm font-bold text-amber-900 placeholder-amber-400"/>
         <button onclick="saveApiKey()" class="px-3 py-1 bg-amber-500 text-white rounded-lg text-xs font-black hover:bg-amber-600 transition-colors">저장</button>
       </div>
@@ -291,6 +284,15 @@
 
   </main>
 
+  <!-- 우하단 API 키 변경 버튼 -->
+  <button onclick="resetApiKey()" title="API 키 변경"
+    class="fixed bottom-4 right-4 z-50 bg-black/20 hover:bg-black/40 text-white/60 hover:text-white p-2 rounded-lg text-[10px] transition-colors flex items-center gap-1">
+    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+    </svg>
+    키
+  </button>
+
 <script>
 const POPULAR_LEGO_SETS = [
   { number: '10316', name: 'Rivendell (반지의 제왕: 리븐델)', image: 'https://images.brickset.com/sets/images/10316-1.jpg', year: '2023' },
@@ -331,6 +333,8 @@ const POPULAR_LEGO_SETS = [
   { number: '76269', name: 'Avengers Tower (어벤져스 타워)', image: 'https://images.brickset.com/sets/images/76269-1.jpg', year: '2023' },
 ];
 
+const DEFAULT_API_KEY = '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';
+
 let currentResult = null;
 let currentTab = 'new';
 let currentPeriod = 'all';
@@ -344,12 +348,10 @@ function resetApiKey() {
   document.getElementById('apiKeySection').classList.remove('hidden');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-
 function loadApiKey() {
   const saved = localStorage.getItem('gemini_api_key');
   if (saved) {
     document.getElementById('apiKeyInput').value = saved;
-    document.getElementById('apiKeySection').classList.add('hidden');
   }
 }
 function saveApiKey() {
@@ -360,7 +362,7 @@ function saveApiKey() {
   }
 }
 function getApiKey() {
-  return localStorage.getItem('gemini_api_key') || document.getElementById('apiKeyInput').value.trim();
+  return localStorage.getItem('gemini_api_key') || DEFAULT_API_KEY;
 }
 
 // Error
