@@ -472,7 +472,7 @@ async function analyzeLego() {
   ]
 }
 
-한국어로 답변. historicalData와 historicalDataUsed는 최소 10개 이상 포함.`;
+중요: 반드시 한국어로만 답변하세요. 한자, 러시아어, 일본어 등 다른 언어를 절대 사용하지 마세요. historicalData와 historicalDataUsed는 최소 10개 이상 포함.`;
 
   try {
     const isGroq = apiKey.startsWith('gsk_');
@@ -483,7 +483,7 @@ async function analyzeLego() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
         body: JSON.stringify({
-          model: 'llama-3.3-70b-versatile',
+          model: 'llama3-70b-8192',
           messages: [{ role: 'user', content: prompt }],
           response_format: { type: 'json_object' }
         })
@@ -660,6 +660,15 @@ function drawChart(r, currentPrice) {
   const ctx = document.getElementById('priceChart').getContext('2d');
   if (priceChart) priceChart.destroy();
 
+  // Y축 범위: 데이터 min/max에 15% 여백
+  const allPrices = data.map(d => d.price).filter(Boolean);
+  if (currentTab === 'new' && currentPrice) allPrices.push(Number(currentPrice));
+  const minPrice = Math.min(...allPrices);
+  const maxPrice = Math.max(...allPrices);
+  const padding = (maxPrice - minPrice) * 0.15 || maxPrice * 0.1;
+  const yMin = Math.floor((minPrice - padding) / 1000) * 1000;
+  const yMax = Math.ceil((maxPrice + padding) / 1000) * 1000;
+
   const datasets = [{
     label: '가격',
     data: data.map(d => d.price),
@@ -714,7 +723,7 @@ function drawChart(r, currentPrice) {
       },
       scales: {
         x: { grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' }, color: '#70757a', maxRotation: 45 } },
-        y: { grid: { color: '#f1f3f4' }, ticks: { font: { size: 10 }, color: '#70757a', callback: v => `₩${(v/1000).toFixed(0)}k` } }
+        y: { min: yMin, max: yMax, grid: { color: '#f1f3f4' }, ticks: { font: { size: 10 }, color: '#70757a', callback: v => `₩${(v/1000).toFixed(0)}k` } }
       }
     }
   });
