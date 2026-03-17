@@ -645,7 +645,7 @@ async function analyzeLego() {
   "averagePrice": 110000,
   "lowestPrice": 95000,
   "lowestPriceDate": "2023-11-24",
-  "lowestPriceMall": "쇼핑몰명",
+  "lowestPriceMall": "레고코리아",
   "releaseYear": 2023,
   "pieceCount": 1500,
   "ppp": 82,
@@ -656,7 +656,9 @@ async function analyzeLego() {
   "investmentReason": "투자 가치 설명",
   "globalPrices": { "amazon": 99.99, "bricklink": 110.00, "currency": "USD" },
   "malls": [
-    { "name": "쇼핑몰명", "price": 105000, "discountRate": 15, "url": "https://example.com", "isLowest": true }
+    { "name": "레고코리아", "price": 99000, "discountRate": 20, "url": "https://www.lego.com/ko-kr", "isLowest": true },
+    { "name": "SSG닷컴", "price": 105000, "discountRate": 15, "url": "https://www.ssg.com", "isLowest": false },
+    { "name": "롯데온", "price": 108000, "discountRate": 13, "url": "https://www.lotteon.com", "isLowest": false }
   ],
   "historicalData": [
     { "date": "2023-06", "price": 123000, "mall": "레고코리아", "discountRate": 0 },
@@ -676,7 +678,7 @@ async function analyzeLego() {
 - releaseYear는 해당 제품의 실제 출시년도(4자리 숫자)를 정확히 작성하세요.
 - historicalData의 date는 반드시 releaseYear부터 시작하세요. 출시 전 날짜는 절대 포함하지 마세요. 2025-03까지 YYYY-MM 형식으로 작성하세요.
 - price는 반드시 숫자(number)로만 작성하세요. 쉼표나 문자 없이.
-- malls의 모든 항목에 name, price, discountRate, url 필드를 반드시 포함하세요.`;
+- malls의 name은 반드시 실제 한국 쇼핑몰명을 사용하세요 (예: 레고코리아, SSG닷컴, 롯데온, 이마트, 옥션, 지마켓, 쿠팡, 11번가, 네이버쇼핑 등). "쇼핑몰명" 같은 placeholder는 절대 사용하지 마세요.`;
 
   try {
     const isGroq = apiKey.startsWith('gsk_');
