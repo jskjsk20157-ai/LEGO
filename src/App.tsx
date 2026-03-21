@@ -80,6 +80,8 @@ interface HistoricalPoint {
 }
 
 interface AnalysisResult {
+  title: string;
+  imageUrl: string;
   status: 'buy' | 'wait' | 'expensive';
   statusText: string;
   summary: string;
@@ -229,40 +231,42 @@ export default function App() {
     setShowSuggestions(false);
   };
 
-  const analyzeLego = async () => {
+  const analyzeLego = async (overrideInterval?: ChartInterval) => {
     if (!setNumber || !currentPrice) {
       setError('제품 번호와 현재 가격을 모두 입력해주세요.');
       return;
     }
 
+    const targetInterval = overrideInterval || chartInterval;
     setIsAnalyzing(true);
     setError(null);
     setResult(null);
 
     try {
-      const model = "gemini-2.0-flash";
+      const model = "gemini-3-flash-preview";
       const prompt = `
         당신은 레고 시장 분석 전문가입니다. 다음 레고 제품에 대한 심층적인 역사적 가격 및 중고 시장 분석을 수행해주세요.
         
         제품 번호: ${setNumber}
         사용자가 입력한 현재 가격: ${currentPrice}원
-        데이터 간격: ${chartInterval === 'weekly' ? '주차별 (Weekly)' : '월별 (Monthly)'}
+        데이터 간격 요구사항: ${targetInterval === 'weekly' ? '최근 6개월간 매주(Weekly) 단위의 정밀한 가격 데이터' : '출시 이후 매월(Monthly) 단위의 가격 데이터'}
         
         [분석 및 출력 요구사항]
-        1. 정가(MSRP), 부품 수(Piece Count)를 확인하세요.
+        1. 제품명(title), 정가(MSRP), 부품 수(Piece Count), 이미지 URL(imageUrl - 공식 또는 고화질 예상 URL)을 확인하세요.
         2. 역대 최저가(All-time Low)와 그 날짜, 쇼핑몰 이름, 그리고 해당 쇼핑몰의 당시 상품 URL(예상)을 포함하세요.
-        3. 출시 이후부터 현재까지의 ${chartInterval === 'weekly' ? '주차별' : '월별'} 가격 변동 트렌드를 조사하세요. (새상품 기준, historicalData 필드)
-        4. 중고 시장(MISB 기준)의 ${chartInterval === 'weekly' ? '주차별' : '월별'} 가격 변동 트렌드도 함께 조사하세요. (historicalDataUsed 필드)
+        3. ${targetInterval === 'weekly' ? '최근 6개월간 주차별' : '출시 이후 월별'} 가격 변동 트렌드를 조사하세요. (새상품 기준, historicalData 필드)
+           - 데이터 포인트는 반드시 ${targetInterval === 'weekly' ? '20개 이상' : '12개 이상'} 포함되어야 합니다.
+           - 날짜 형식은 YYYY-MM-DD로 통일하세요.
+        4. 중고 시장(MISB 기준)의 동일 기간 가격 변동 트렌드도 함께 조사하세요. (historicalDataUsed 필드)
         5. 현재 유통 중인 주요 쇼핑몰의 실시간 가격과 정확한 URL을 조사하세요.
-        6. 중고 시장 시세를 분석하세요:
-           - MISB (Mint In Sealed Box): 미개봉 새제품
-           - MIB (Mint In Box): 박스는 개봉했으나 내부 봉지는 미개봉
-           - Used: 조립 완료 또는 박스 없는 중고
-        7. 이 제품의 단종 예상 시기와 단종 위험도(low, medium, high)를 분석하세요.
+        6. 중고 시장 시세를 분석하세요 (MISB, MIB, Used).
+        7. 이 제품의 단종 예상 시기와 단종 위험도를 분석하세요.
         8. 재테크 지수(0-100)와 해외 가격(Amazon, BrickLink)을 조사하세요.
         
         [출력 형식 - JSON]
         {
+          "title": "제품명",
+          "imageUrl": "이미지 URL",
           "status": "buy" | "wait" | "expensive",
           "statusText": "...",
           "summary": "...",
@@ -301,7 +305,6 @@ export default function App() {
         }
         
         반드시 한국어로 답변하고, Google Search를 활용하여 실제 데이터를 최대한 반영하세요.
-        데이터 포인트는 최소 10개 이상 생성하여 그래프가 풍부하게 보이게 하세요.
       `;
 
       const response = await genAI.models.generateContent({
@@ -309,6 +312,7 @@ export default function App() {
         contents: prompt,
         config: {
           responseMimeType: "application/json",
+          tools: [{ googleSearch: {} }]
         }
       });
 
@@ -316,7 +320,7 @@ export default function App() {
       setResult(data);
     } catch (err) {
       console.error(err);
-      setError(`오류: ${err instanceof Error ? err.message : String(err)}`);
+      setError('분석 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
     } finally {
       setIsAnalyzing(false);
     }
@@ -324,6 +328,7 @@ export default function App() {
 
   const filteredData = result ? (() => {
     const rawData = activeTab === 'new' ? result.historicalData : (result.historicalDataUsed || []);
+    if (!Array.isArray(rawData)) return [];
     let data = [...rawData].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
     
     if (period === 'all') return data;
@@ -459,14 +464,8 @@ export default function App() {
             </div>
           </div>
 
-          {error && (
-            <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-4 text-red-700 font-bold text-sm break-all">
-              {error}
-            </div>
-          )}
-
-          <button
-            onClick={analyzeLego}
+          <button 
+            onClick={() => analyzeLego()}
             disabled={isAnalyzing}
             className="w-full bg-[#e53935] hover:bg-[#d32f2f] disabled:bg-[#e53935]/50 text-white font-black py-5 rounded-2xl transition-all flex items-center justify-center gap-3 text-xl shadow-md active:shadow-none active:translate-y-[2px]"
           >
@@ -536,6 +535,41 @@ export default function App() {
               animate={{ opacity: 1, y: 0 }}
               className="space-y-8"
             >
+              {/* Product Header Card */}
+              <div className="bg-white/90 backdrop-blur-sm rounded-[2rem] p-8 border-2 border-[#e53935] shadow-lg flex flex-col md:flex-row items-center gap-8">
+                <div className="w-48 h-48 bg-[#f8f9fa] rounded-3xl overflow-hidden flex-shrink-0 border-2 border-[#dadce0] p-4">
+                  <img 
+                    src={result.imageUrl || `https://picsum.photos/seed/${setNumber}/400/400`} 
+                    alt={result.title} 
+                    className="w-full h-full object-contain"
+                    referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = `https://picsum.photos/seed/${setNumber}/400/400`;
+                    }}
+                  />
+                </div>
+                <div className="flex-1 text-center md:text-left">
+                  <div className="inline-block px-4 py-1.5 bg-[#e53935] text-white rounded-full text-xs font-black mb-3 tracking-widest">
+                    ANALYSIS RESULT
+                  </div>
+                  <h2 className="text-3xl font-black text-[#3c4043] mb-2 leading-tight">
+                    {result.title}
+                  </h2>
+                  <div className="text-xl font-black text-[#e53935] flex items-center justify-center md:justify-start gap-2">
+                    <Tag className="w-5 h-5" />
+                    SET #{setNumber}
+                  </div>
+                  <div className="mt-4 flex flex-wrap justify-center md:justify-start gap-3">
+                    <div className="px-3 py-1 bg-[#f1f3f4] rounded-lg text-xs font-bold text-[#70757a]">
+                      {result.pieceCount.toLocaleString()} Pieces
+                    </div>
+                    <div className="px-3 py-1 bg-[#f1f3f4] rounded-lg text-xs font-bold text-[#70757a]">
+                      MSRP ₩{result.originalPrice.toLocaleString()}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               {/* Action Buttons */}
               <div className="flex gap-4">
                 <button 
@@ -766,7 +800,10 @@ export default function App() {
                         {(['monthly', 'weekly'] as ChartInterval[]).map((i) => (
                           <button
                             key={i}
-                            onClick={() => setChartInterval(i)}
+                            onClick={() => {
+                              setChartInterval(i);
+                              analyzeLego(i);
+                            }}
                             className={cn(
                               "px-3 py-1.5 text-[10px] font-black rounded-lg transition-all",
                               chartInterval === i ? "bg-white text-[#42a5f5] shadow-sm border border-[#dadce0]" : "text-[#70757a] hover:text-[#3c4043]"
@@ -899,7 +936,7 @@ export default function App() {
                   <span className="text-[11px] font-black text-[#70757a] bg-white px-3 py-1 rounded-full border border-[#dadce0]">정가 ₩{result.originalPrice.toLocaleString()} 대비</span>
                 </div>
                 <div className="divide-y divide-[#f1f3f4]">
-                  {result.malls.map((mall, idx) => (
+                  {Array.isArray(result.malls) && result.malls.map((mall, idx) => (
                     <a 
                       key={idx} 
                       href={mall.url}
